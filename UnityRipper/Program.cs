@@ -4,14 +4,24 @@ using System.IO;
 using System.Linq;
 using UnityRipper.AssetsFiles;
 
+using Object = UnityRipper.Classes.Object;
+
 namespace UnityRipper
 {
-	class Program
+	public class Program
 	{
+		public static IEnumerable<Object> FetchExportObjects(AssetCollection collection)
+		{
+			//yield break;
+			return collection.FetchObjects()
+				.Where(t => t.AssetsFile.Name == "29ae6f85a6c2d4e9fa563e182a4b73bd")
+				.Where(t => t.ClassID == ClassIDType.Material);
+		}
+
 		public static void Main(string[] args)
 		{
 			Logger.Instance = ConsoleLogger.Instance;
-			Config.IsAdvanceLog = true;
+			Config.IsAdvancedLog = true;
 			Config.IsGenerateGUIDByContent = false;
 			Config.IsExportDependencies = true;
 
@@ -35,63 +45,9 @@ namespace UnityRipper
 			{
 				AssetCollection collection = new AssetCollection();
 				collection.Load(args);
-
-				HashSet<string> directories = new HashSet<string>();
-				foreach (string filePath in args)
-				{
-					string dirPath = Path.GetDirectoryName(filePath);
-					directories.Add(dirPath);
-				}
-
-				HashSet<string> precessed = new HashSet<string>();
-				foreach (IAssetsFile assetsFile in collection.AssetsFiles)
-				{
-					precessed.Add(assetsFile.Name);
-				}
-
-				for (int i = 0; i < collection.AssetsFiles.Count; i++)
-				{
-					IAssetsFile assetsFile = collection.AssetsFiles[i];
-					foreach (AssetsFilePtr ptr in assetsFile.Dependencies)
-					{
-						string fileName = ptr.FileName;
-						if (precessed.Contains(fileName))
-						{
-							continue;
-						}
-						precessed.Add(fileName);
-
-						bool added = false;
-						foreach (string dirPath in directories)
-						{
-							string filePath = Path.Combine(dirPath, fileName);
-							if (File.Exists(filePath))
-							{
-								try
-								{
-									collection.Load(filePath);
-									foreach (IAssetsFile cur in collection.AssetsFiles)
-									{
-										// not sure is this necessary?
-										precessed.Add(cur.Name);
-									}
-									added = true;
-									Logger.Instance.Log(LogType.Info, LogCategory.Import, $"Dependency '{filePath}' loaded");
-									break;
-								}
-								catch
-								{
-									Logger.Instance.Log(LogType.Error, LogCategory.Import, $"Can't parse dependency file {filePath}");
-								}
-							}
-						}
-
-						if(!added)
-						{
-							Logger.Instance.Log(LogType.Warning, LogCategory.Import, $"Dependency '{fileName}' wasn't found");
-						}
-					}
-				}
+				
+				LoadDependencies(collection, args);
+				ValidateCollection(collection);
 
 				string name = Path.GetFileNameWithoutExtension(args.First());
 				string exportPath = ".\\Ripped\\" + name;
@@ -99,7 +55,7 @@ namespace UnityRipper
 				{
 					Directory.Delete(exportPath, true);
 				}
-				collection.Exporter.Export(exportPath, collection.FetchObjects());
+				collection.Exporter.Export(exportPath, FetchExportObjects(collection));
 
 				Logger.Instance.Log(LogType.Info, LogCategory.General, "Finished");
 			}
@@ -108,6 +64,106 @@ namespace UnityRipper
 				Logger.Instance.Log(LogType.Error, LogCategory.General, ex.ToString());
 			}
 			Console.ReadKey();
+		}
+
+		private static void LoadDependencies(AssetCollection collection, IEnumerable<string> files)
+		{
+			HashSet<string> directories = new HashSet<string>();
+			foreach (string filePath in files)
+			{
+				string dirPath = Path.GetDirectoryName(filePath);
+				directories.Add(dirPath);
+			}
+
+			HashSet<string> processed = new HashSet<string>();
+			foreach (IAssetsFile assetsFile in collection.AssetsFiles)
+			{
+				processed.Add(assetsFile.Name);
+			}
+
+			for (int i = 0; i < collection.AssetsFiles.Count; i++)
+			{
+				IAssetsFile assetsFile = collection.AssetsFiles[i];
+				foreach (AssetsFilePtr ptr in assetsFile.Dependencies)
+				{
+					string fileName = ptr.FileName;
+					if (processed.Contains(fileName))
+					{
+						continue;
+					}
+					processed.Add(fileName);
+
+					bool found = false;
+					foreach (string loadName in FetchNameVariants(fileName))
+					{
+						found = TryLoadDependency(collection, directories, fileName, loadName);
+						if (found)
+						{
+							// not sure is this necessary?
+							foreach (IAssetsFile cur in collection.AssetsFiles)
+							{
+								processed.Add(cur.Name);
+							}
+
+							break;
+						}
+					}
+					if(!found)
+					{
+						Logger.Instance.Log(LogType.Warning, LogCategory.Import, $"Dependency '{fileName}' wasn't found");
+					}
+				}
+			}
+		}
+
+		private static void ValidateCollection(AssetCollection collection)
+		{
+			IEnumerable<Version> versions = collection.AssetsFiles.Select(t => t.Version).Distinct();
+			if(versions.Count() > 1)
+			{
+				Logger.Instance.Log(LogType.Warning, LogCategory.Import, $"Asset collection has incompatible (possible) with each assets file versions. Here they are:");
+				foreach(Version version in versions)
+				{
+					Logger.Instance.Log(LogType.Warning, LogCategory.Import, version.ToString());
+				}
+			}
+		}
+
+		private static bool TryLoadDependency(AssetCollection collection, IEnumerable<string> directories, string originalName, string loadName)
+		{
+			foreach (string dirPath in directories)
+			{
+				string filePath = Path.Combine(dirPath, loadName);
+				if (!File.Exists(filePath))
+				{
+					continue;
+				}
+
+				try
+				{
+					collection.LoadAssetsFile(filePath, originalName);
+					Logger.Instance.Log(LogType.Info, LogCategory.Import, $"Dependency '{filePath}' loaded");
+				}
+				catch (Exception ex)
+				{
+					Logger.Instance.Log(LogType.Error, LogCategory.Import, $"Can't parse dependency file {filePath}");
+					Logger.Instance.Log(LogType.Error, LogCategory.Debug, ex.ToString());
+				}
+				return true;
+			}
+			return false;
+		}
+
+		private static IEnumerable<string> FetchNameVariants(string name)
+		{
+			yield return name;
+
+			const string libraryFolder = "library";
+			if (name.ToLower().StartsWith(libraryFolder))
+			{
+				string fixedName = name.Substring(libraryFolder.Length + 1);
+				yield return fixedName;
+			}
 		}
 	}
 }

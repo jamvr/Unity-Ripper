@@ -34,9 +34,9 @@ namespace UnityRipper.Classes.Materials
 		{
 			YAMLMappingNode node = new YAMLMappingNode();
 			node.AddSerializedVersion(SerializedVersion);
-			node.Add("m_TexEnvs", m_texEnvs.ExportYAML());
+			node.Add("m_Test", m_texEnvs.ExportYAML());
 			node.Add("m_Floats", m_floats.ExportYAML());
-			node.Add("m_Сolors", m_colors.ExportYAML());
+			node.Add("m_Test", m_colors.ExportYAML());
 			return node;
 		}
 

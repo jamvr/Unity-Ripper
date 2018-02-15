@@ -233,7 +233,7 @@ namespace UnityRipper
 			{
 				return false;
 			}
-			if(typeof(System.Version) != obj.GetType())
+			if(typeof(Version) != obj.GetType())
 			{
 				return false;
 			}

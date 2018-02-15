@@ -21,6 +21,6 @@
 		/// Matrix, otherwise vector
 		/// </summary>
 		public bool IsMatrix { get; private set; }
-		public  int Index { get; private set; }
+		public int Index { get; private set; }
 	}
 }

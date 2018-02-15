@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityRipper.AssetsFiles;
 using UnityRipper.Bundles;
@@ -17,22 +18,33 @@ namespace UnityRipper
 		{
 			if (BundleFile.IsBundleFile(filePath))
 			{
-				BundleFile bundle = new BundleFile();
-				using (AssetsFileData fileData = bundle.Load(filePath))
-				{
-					foreach (AssetsFileEntry entry in fileData.AssetsEntries)
-					{
-						AssetsFile assetsFile = entry.CreateAssetsFile(this);
-						AddAsset(assetsFile);
-					}
-				}
+				LoadAssetBundle(filePath);
 			}
 			else
 			{
-				AssetsFile assetsFile = new AssetsFile(this, filePath);
-				assetsFile.Load(filePath);
-				AddAsset(assetsFile);
+				string fileName = Path.GetFileName(filePath);
+				LoadAssetsFile(filePath, fileName);
 			}
+		}
+
+		public void LoadAssetBundle(string filePath)
+		{
+			BundleFile bundle = new BundleFile();
+			using (AssetsFileData fileData = bundle.Load(filePath))
+			{
+				foreach (AssetsFileEntry entry in fileData.AssetsEntries)
+				{
+					AssetsFile assetsFile = entry.ParseAssetsFile(this);
+					AddAsset(assetsFile);
+				}
+			}
+		}
+
+		public void LoadAssetsFile(string filePath, string fileName)
+		{
+			AssetsFile assetsFile = new AssetsFile(this, filePath, fileName);
+			assetsFile.Load(filePath);
+			AddAsset(assetsFile);
 		}
 
 		public void Load(IReadOnlyCollection<string> filePathes)
@@ -117,7 +129,6 @@ namespace UnityRipper
 			}
 			if (!m_files.All(t => t.Version == file.Version))
 			{
-				throw new ArgumentException($"Assets file '{file.Name}' has incompatible with other assets files version {file.Version}", nameof(file));
 			}
 			
 			m_files.Add(file);

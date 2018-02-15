@@ -6,6 +6,13 @@ namespace UnityRipper
 	{
 		public void Log(LogType type, LogCategory category, string message)
 		{
+#if !DEBUG
+			if(category == LogCategory.Debug)
+			{
+				return;
+			}
+#endif
+
 			ConsoleColor backColor = Console.BackgroundColor;
 			ConsoleColor foreColor = Console.ForegroundColor;
 

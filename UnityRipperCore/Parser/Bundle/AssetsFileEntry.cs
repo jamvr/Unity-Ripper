@@ -31,9 +31,9 @@ namespace UnityRipper.Bundles
 			m_length = length;
 		}
 
-		public AssetsFile CreateAssetsFile(IAssetCollection collection)
+		public AssetsFile ParseAssetsFile(IAssetCollection collection)
 		{
-			AssetsFile assetsFile = new AssetsFile(collection, Name);
+			AssetsFile assetsFile = new AssetsFile(collection, string.Empty, Name);
 			m_stream.Position = m_offset;
 			assetsFile.Parse(m_stream);
 			long read = m_stream.Position - m_offset;

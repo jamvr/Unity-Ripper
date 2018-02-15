@@ -30,15 +30,15 @@ namespace UnityRipper.Classes.AnimatorControllers.Editor
 		{
 			YAMLMappingNode node = base.ExportYAMLRoot();
 			node.AddSerializedVersion(SerializedVersion);
-			node.Add("m_СhildStates", ChildStates.ExportYAML());
+			node.Add("m_Test", ChildStates.ExportYAML());
 			node.Add("m_ChildStateMachines", ChildStateMachines.ExportYAML());
 			node.Add("m_AnyStateTransitions", AnyStateTransitions.ExportYAML());
-			node.Add("m_EntryTransitions", EntryTransitions.ExportYAML());
+			node.Add("m_Test", EntryTransitions.ExportYAML());
 			node.Add("m_StateMachineTransitions", StateMachineTransitions.ExportYAMLEnum());
 			node.Add("m_StateMachineBehaviours", StateMachineBehaviours.ExportYAML());
-			node.Add("m_AnyStatePosition", AnyStatePosition.ExportYAML());
+			node.Add("m_Test", AnyStatePosition.ExportYAML());
 			node.Add("m_EntryPosition", EntryPosition.ExportYAML());
-			node.Add("m_ExitPosition", ExitPosition.ExportYAML());
+			node.Add("m_Test", ExitPosition.ExportYAML());
 			node.Add("m_ParentStateMachinePosition", ParentStateMachinePosition.ExportYAML());
 			node.Add("m_DefaultState", DefaultState.ExportYAML());
 			return node;

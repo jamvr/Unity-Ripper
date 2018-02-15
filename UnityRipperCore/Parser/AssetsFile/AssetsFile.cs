@@ -9,24 +9,20 @@ namespace UnityRipper.AssetsFiles
 {
 	internal class AssetsFile : IAssetsFile
 	{
-		public AssetsFile(IAssetCollection collection, string filepath)
+		public AssetsFile(IAssetCollection collection, string filePath, string fileName)
 		{
 			if(collection == null)
 			{
 				throw new ArgumentNullException(nameof(collection));
 			}
-			if (string.IsNullOrEmpty(filepath))
+			if (string.IsNullOrEmpty(fileName))
 			{
-				throw new ArgumentException("filepath");
+				throw new ArgumentNullException(nameof(fileName));
 			}
 
 			m_collection = collection;
-			FilePath = filepath;
-			Name = Path.GetFileNameWithoutExtension(FilePath);
-			if(Name == string.Empty)
-			{
-				throw new ArgumentException($"Can't obtain name from fullname {filepath}", "fullname");
-			}
+			FilePath = filePath;
+			Name = fileName;
 		}
 
 		public void Load(string assetPath)

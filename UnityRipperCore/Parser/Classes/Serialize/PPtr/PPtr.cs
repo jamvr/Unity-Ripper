@@ -107,7 +107,7 @@ namespace UnityRipper.Classes
 
 		public string ToLogString()
 		{
-			if(Config.IsAdvanceLog)
+			if(Config.IsAdvancedLog)
 			{
 				string depName = m_assetsFile.Dependencies[AssetsFileIndex].FileName;
 				ClassIDType classID = typeof(T).ToUnityClassType();

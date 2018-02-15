@@ -5,5 +5,7 @@
 		General,
 		Import,
 		Export,
+
+		Debug,
 	}
 }

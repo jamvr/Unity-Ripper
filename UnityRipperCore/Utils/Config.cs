@@ -9,7 +9,7 @@
 		/// <summary>
 		/// Does it should log whole info or just numeric data (may slow down the process)
 		/// </summary>
-		public static bool IsAdvanceLog { get; set; } = true;
+		public static bool IsAdvancedLog { get; set; } = true;
 		/// <summary>
 		/// Should objects get exported with dependencies or without
 		/// </summary>

@@ -1,4 +1,5 @@
 **/.vs/
+*.csproj.user
 
 Bins/
 Test/
