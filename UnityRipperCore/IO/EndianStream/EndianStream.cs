@@ -166,7 +166,7 @@ namespace UnityRipper
 			{
 				throw new Exception($"Read {read} bytes intead of {length}");
 			}
-			return Encoding.ASCII.GetString(m_bufferString, 0, length);
+			return Encoding.UTF8.GetString(m_bufferString, 0, length);
 		}
 
 		public string ReadStringAligned()
@@ -178,7 +178,7 @@ namespace UnityRipper
 		public string ReadStringAligned(int length)
 		{
 			byte[] buffer = ReadStringBuffer(length);
-			string result = Encoding.ASCII.GetString(buffer, 0, length);
+			string result = Encoding.UTF8.GetString(buffer, 0, length);
 			AlignStream(AlignType.Align4);
 			return result;
 		}
