@@ -13,9 +13,7 @@ namespace UnityRipper
 		public static IEnumerable<Object> FetchExportObjects(AssetCollection collection)
 		{
 			//yield break;
-			return collection.FetchObjects()
-				.Where(t => t.AssetsFile.Name == "29ae6f85a6c2d4e9fa563e182a4b73bd")
-				.Where(t => t.ClassID == ClassIDType.Material);
+			return collection.FetchObjects();
 		}
 
 		public static void Main(string[] args)
