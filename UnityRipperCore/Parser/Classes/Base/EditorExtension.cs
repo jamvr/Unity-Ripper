@@ -3,9 +3,9 @@ using UnityRipper.Exporter.YAML;
 
 namespace UnityRipper.Classes
 {
-	public class EditorExtension : Object
+	public abstract class EditorExtension : Object
 	{
-		public EditorExtension(AssetInfo assetInfo):
+		protected EditorExtension(AssetInfo assetInfo):
 			base(assetInfo)
 		{
 			PrefabParentObject = new PPtr<EditorExtension>(AssetsFile);

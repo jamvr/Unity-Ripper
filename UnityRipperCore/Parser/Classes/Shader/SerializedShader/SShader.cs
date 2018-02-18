@@ -11,6 +11,7 @@ namespace UnityRipper.Classes
 		public SShader(AssetInfo assetInfo):
 			base(assetInfo)
 		{
+			ParsedForm = new SerializedShader(AssetsFile);
 		}
 
 		public static bool IsSerialized(Version version)
@@ -72,7 +73,7 @@ namespace UnityRipper.Classes
 		
 		public override string ExportExtension => "shader";
 		
-		public SerializedShader ParsedForm { get; } = new SerializedShader();
+		public SerializedShader ParsedForm { get; }
 		public IReadOnlyList<uint> Platforms => m_platforms;
 		public IReadOnlyList<uint> Offsets => m_offsets;
 		public IReadOnlyList<uint> CompressedLengths => m_compressedLengths;

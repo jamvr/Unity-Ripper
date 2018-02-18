@@ -2,7 +2,7 @@
 {
 	public abstract class Motion : NamedObject
 	{
-		public Motion(AssetInfo assetInfo):
+		protected Motion(AssetInfo assetInfo):
 			base(assetInfo)
 		{
 		}

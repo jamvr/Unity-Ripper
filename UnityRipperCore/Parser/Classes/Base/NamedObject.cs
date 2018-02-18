@@ -4,7 +4,7 @@ namespace UnityRipper.Classes
 {
 	public abstract class NamedObject : EditorExtension
 	{
-		public NamedObject(AssetInfo assetInfo) :
+		protected NamedObject(AssetInfo assetInfo) :
 			base(assetInfo)
 		{
 		}

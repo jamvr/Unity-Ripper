@@ -200,15 +200,15 @@ namespace UnityRipper.Classes
 		/// <summary>
 		/// 5.6.0 and greater
 		/// </summary>
-		private bool IsReadOtherFlags => Version.IsGreater(5, 6);
+		private bool IsReadOtherFlags => Version.IsGreaterEqual(5, 6);
 		/// <summary>
 		/// 5.1.0 and greater
 		/// </summary>
-		private bool IsReadStringTagMap => Version.IsGreater(5, 1);
+		private bool IsReadStringTagMap => Version.IsGreaterEqual(5, 1);
 		/// <summary>
 		/// 5.6.0 and greater
 		/// </summary>
-		private bool IsReadDisabledShaderPasses => Version.IsGreater(5, 6);
+		private bool IsReadDisabledShaderPasses => Version.IsGreaterEqual(5, 6);
 		/// <summary>
 		/// 5.5.0 and greater
 		/// </summary>

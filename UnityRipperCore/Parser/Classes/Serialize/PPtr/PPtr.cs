@@ -44,6 +44,7 @@ namespace UnityRipper.Classes
 
 		public YAMLNode ExportYAML()
 		{
+#warning TODO: rewrite all export yaml methods to methods with export paramter
 			if (IsNull)
 			{
 				return ExportPointer.EmptyPointer.ExportYAML();

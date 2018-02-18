@@ -4,7 +4,7 @@ namespace UnityRipper.Classes
 {
 	public abstract class Behaviour : Component
 	{
-		public Behaviour(AssetInfo assetInfo):
+		protected Behaviour(AssetInfo assetInfo):
 			base(assetInfo)
 		{
 		}

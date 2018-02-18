@@ -25,14 +25,18 @@ namespace UnityRipper.AssetExporters
 			return new EmptyExportCollection(this, name);
 		}
 
-		public void Export(IExportCollection collection, string dirPath)
+		public bool Export(IExportCollection collection, string dirPath)
 		{
+			return false;
 		}
 
 		public AssetType ToExportType(ClassIDType classID)
 		{
 			switch (classID)
 			{
+				case ClassIDType.Texture2D:
+					return AssetType.Meta;
+
 				case ClassIDType.AnimatorController:
 					return AssetType.Serialized;
 

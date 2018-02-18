@@ -43,7 +43,7 @@ namespace UnityRipper.AssetExporters
 			}
 		}
 
-		public override void Export(IExportCollection collection, string dirPath)
+		public override bool Export(IExportCollection collection, string dirPath)
 		{
 			AssetExportCollection asset = (AssetExportCollection)collection;
 			string subFolder = asset.Asset.ClassID.ToString();
@@ -61,6 +61,7 @@ namespace UnityRipper.AssetExporters
 				YAMLExporter.Export(prefab.Objects, filePath);
 			}
 			ExportMeta(collection, filePath);
+			return true;
 		}
 
 		public override AssetType ToExportType(ClassIDType classID)

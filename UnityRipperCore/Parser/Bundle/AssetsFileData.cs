@@ -30,6 +30,7 @@ namespace UnityRipper.Bundles
 		}
 
 		public IEnumerable<AssetsFileEntry> AssetsEntries => m_entries.Where(t => t.IsAssetsFile);
+		public IEnumerable<AssetsFileEntry> ResourceEntries => m_entries.Where(t => !t.IsAssetsFile);
 
 		private readonly List<AssetsFileEntry> m_entries = new List<AssetsFileEntry>();
 

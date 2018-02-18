@@ -1,13 +1,24 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using UnityRipper.AssetsFiles;
 
 namespace UnityRipper.Classes.Shaders
 {
 	public sealed class SerializedShader : IStreamReadable
 	{
+		public SerializedShader(IAssetsFile assetsFile)
+		{
+			if (assetsFile == null)
+			{
+				throw new Exception(nameof(assetsFile));
+			}
+			m_assetsFile = assetsFile;
+		}
+
 		public void Read(EndianStream stream)
 		{
 			PropInfo.Read(stream);
-			m_subShaders = stream.ReadArray<SerializedSubShader>();
+			m_subShaders = stream.ReadArray(() => new SerializedSubShader(m_assetsFile));
 			Name = stream.ReadStringAligned();
 			CustomEditorName = stream.ReadStringAligned();
 			FallbackName = stream.ReadStringAligned();
@@ -23,6 +34,8 @@ namespace UnityRipper.Classes.Shaders
 		public string FallbackName { get; private set; }
 		public IReadOnlyList<SerializedShaderDependency> Dependencies => m_dependencies;
 		public bool DisableNoSubshadersMessage { get; private set; }
+
+		private readonly IAssetsFile m_assetsFile;
 
 		private SerializedSubShader[] m_subShaders;
 		private SerializedShaderDependency[] m_dependencies;

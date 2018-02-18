@@ -28,6 +28,7 @@ namespace UnityRipper.AssetExporters
 			OverrideExporter(ClassIDType.AvatarMask, yamlExporter);
 
 			BinaryAssetExporter binExporter = new BinaryAssetExporter();
+			OverrideExporter(ClassIDType.Texture2D, binExporter);
 			OverrideExporter(ClassIDType.Shader, binExporter);
 			OverrideExporter(ClassIDType.TextAsset, binExporter);
 		}
@@ -83,8 +84,11 @@ namespace UnityRipper.AssetExporters
 			foreach(IExportCollection collection in m_collections)
 			{
 				m_currentCollection = collection;
-				collection.AssetExporter.Export(collection, path);
-				Logger.Log(LogType.Info, LogCategory.Export, $"'{collection.Name}' exported");
+				bool isExported = collection.AssetExporter.Export(collection, path);
+				if(isExported)
+				{
+					Logger.Log(LogType.Info, LogCategory.Export, $"'{collection.Name}' exported");
+				}
 			}
 
 			m_currentCollection = null;
@@ -93,18 +97,17 @@ namespace UnityRipper.AssetExporters
 		
 		public AssetType ToExportType(ClassIDType classID)
 		{
+			// abstract objects
 			switch (classID)
 			{
-				// abstract objects
 				case ClassIDType.Object:
+					return AssetType.Meta;
+
+				case ClassIDType.Texture:
 					return AssetType.Meta;
 
 				case ClassIDType.RuntimeAnimatorController:
 					return AssetType.Serialized;
-
-				// not supported yet
-				case ClassIDType.Texture:
-					return AssetType.Meta;
 			}
 
 			if(!m_exporters.ContainsKey(classID))

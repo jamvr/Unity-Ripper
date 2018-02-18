@@ -47,6 +47,10 @@ namespace UnityRipper.AssetsFiles
 					Object = new MeshRenderer(AssetInfo);
 					break;
 
+				case ClassIDType.Texture2D:
+					Object = new Texture2D(AssetInfo);
+					break;
+
 				case ClassIDType.MeshFilter:
 					Object = new MeshFilter(AssetInfo);
 					break;

@@ -14,5 +14,10 @@
 		/// Should objects get exported with dependencies or without
 		/// </summary>
 		public static bool IsExportDependencies { get; set; } = true;
+#warning TODO: implement
+		/// <summary>
+		/// Is convert textures to png file format or export as is?
+		/// </summary>
+		public static bool IsConvertTexturesToPNG { get; set; } = false;
 	}
 }

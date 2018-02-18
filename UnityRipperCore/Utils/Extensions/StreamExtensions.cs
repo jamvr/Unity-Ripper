@@ -5,11 +5,11 @@ namespace UnityRipper
 {
 	public static class StreamExtensions
 	{
-		public static void CopyStream(this Stream _this, Stream dstStream, int size)
+		public static void CopyStream(this Stream _this, Stream dstStream, long size)
 		{
-			for(int left = size; left > 0; left -= BufferSize)
+			for(long left = size; left > 0; left -= BufferSize)
 			{
-				int toRead = BufferSize < left ? BufferSize : left;
+				int toRead = BufferSize < left ? BufferSize : (int)left;
 				int read = _this.Read(s_buffer, 0, toRead);
 				if(read != toRead)
 				{

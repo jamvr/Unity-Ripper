@@ -34,8 +34,13 @@ namespace UnityRipper
 			{
 				foreach (AssetsFileEntry entry in fileData.AssetsEntries)
 				{
-					AssetsFile assetsFile = entry.ParseAssetsFile(this);
+					AssetsFile assetsFile = entry.ParseAssetsFile(this, filePath);
 					AddAsset(assetsFile);
+				}
+				foreach (AssetsFileEntry entry in fileData.ResourceEntries)
+				{
+					ResourcesFile resesFile = entry.ParseResourcesFile(filePath);
+					m_resources.Add(resesFile);
 				}
 			}
 		}
@@ -85,6 +90,43 @@ namespace UnityRipper
 			return m_files.Find(t => t.Name == ptr.FileName);
 		}
 
+		public ResourcesFile FindResourcesFile(IAssetsFile iAssetsFile, string fileName)
+		{
+			AssetsFile assetsFile = (AssetsFile)iAssetsFile;
+			string filePath = assetsFile.FilePath;
+			foreach (ResourcesFile res in m_resources)
+			{
+				// assets bundles and loaded resources files
+				if(res.FilePath == filePath && res.Name == fileName)
+				{
+					return res;
+				}
+			}
+
+			string dirPath = Path.GetDirectoryName(filePath);
+			filePath = Path.Combine(dirPath, fileName);
+			if (File.Exists(filePath))
+			{
+				// lazy loading
+				using (FileStream file = File.OpenRead(filePath))
+				{
+					using (BinaryReader stream = new BinaryReader(file))
+					{
+						if(file.Length > int.MaxValue)
+						{
+							throw new Exception($"Unsupported resource size {file.Length}");
+						}
+						byte[] buffer = new byte[file.Length];
+						stream.Read(buffer, 0, buffer.Length);
+						ResourcesFile resesFile = new ResourcesFile(filePath, fileName, buffer);
+						m_resources.Add(resesFile);
+						return resesFile;
+					}
+				}
+			}
+			return null;
+		}
+
 		public AssetType ToExportType(ClassIDType unityType)
 		{
 			return Exporter.ToExportType(unityType);
@@ -127,13 +169,9 @@ namespace UnityRipper
 			{
 				throw new ArgumentException($"Assets file '{file.Name}' has incompatible with other assets files platform {file.Platform} ", nameof(file));
 			}
-			if (!m_files.All(t => t.Version == file.Version))
-			{
-			}
 			
 			m_files.Add(file);
 			m_ifiles.Add(file);
-			Test(file);
 		}
 
 		private void FillVersion(AssetsFile file)
@@ -147,79 +185,12 @@ namespace UnityRipper
 				}
 			}
 		}
-
-		private void Test(AssetsFile file)
-		{
-			foreach (AssetPreloadData preload in file.PreloadData)
-			{
-				switch(preload.UnityType)
-				{
-					case ClassIDType.SkinnedMeshRenderer:
-						//SkinnedMeshRenderer skin = (SkinnedMeshRenderer)preload.RetreaveObject(preload.AssetInfo);
-						//Exporter.Export(skin, "D:\\Test\\1\\");
-						break;
-						
-					case ClassIDType.Mesh:
-						//Mesh mesh = (Mesh)preload.RetreaveObject(preload.AssetInfo);
-						//string mpath = Path.Combine("D:\\Test\\Mesh\\", mesh.Name);
-						//mpath = $"{mpath}.{mesh.ExportExtension}";
-						//YAMLExporter.Export(mesh, mpath);
-						break;
-
-					case ClassIDType.AnimationClip:
-						//AnimationClip clip = (AnimationClip)preload.RetreaveObject(preload.AssetInfo);
-						//string cpath = Path.Combine("D:\\Test\\AnimationClip\\", clip.Name);
-						//cpath = $"{cpath}.{clip.ExportExtension}";
-						//YAMLExporter.Export(clip, cpath);
-						break;
-
-					case ClassIDType.Material:
-						//Material mat = (Material)preload.RetreaveObject(preload.AssetInfo);
-						//string matpath = Path.Combine("D:\\Test\\Material\\", mat.Name);
-						//matpath = $"{matpath}.{mat.ExportExtension}";
-						//YAMLExporter.Export(mat, matpath);
-						break;
-
-					case ClassIDType.Shader:
-						if(SShader.IsSerialized(file.Version))
-						{
-							//SShader shader = (SShader)preload.RetreaveObject(preload.AssetInfo);
-						}
-						else
-						{
-							/*Shader shader = (Shader)preload.RetreaveObject(preload.AssetInfo);
-							string shaderpath = Path.Combine("D:\\Test\\Shader\\", shader.Name);
-							shaderpath = $"{shaderpath}.{shader.ExportExtension}";
-							using (FileStream fileStream = File.Open(shaderpath, FileMode.Create, FileAccess.Write))
-							{
-								byte[] content = shader.ExportBinary();
-								fileStream.Write(content, 0, content.Length);
-							}*/
-						}
-						break;
-						
-					case ClassIDType.TextAsset:
-						/*TextAsset text = (TextAsset)preload.RetreaveObject(preload.AssetInfo);
-						string textpath = Path.Combine("D:\\Test\\Text\\", text.Name);
-						textpath = $"{textpath}.{text.ExportExtension}";
-						using (FileStream fileStream = File.Open(textpath, FileMode.Create, FileAccess.Write))
-						{
-							byte[] content = text.ExportBinary();
-							fileStream.Write(content, 0, content.Length);
-						}*/
-						break;
-
-					default:
-						//preload.RetreaveObject(preload.AssetInfo);
-						break;
-				}
-			}
-		}
 		
 		public AssetsExporter Exporter { get; } = new AssetsExporter();
 		public IReadOnlyList<IAssetsFile> AssetsFiles => m_ifiles;
 
 		private readonly List<AssetsFile> m_files = new List<AssetsFile>();
 		private readonly List<IAssetsFile> m_ifiles = new List<IAssetsFile>();
+		private readonly List<ResourcesFile> m_resources = new List<ResourcesFile>();
 	}
 }

@@ -9,6 +9,7 @@ namespace UnityRipper
 	{
 		IAssetsFile GetAssetsFile(AssetsFilePtr ptr);
 		IAssetsFile FindAssetsFile(AssetsFilePtr ptr);
+		ResourcesFile FindResourcesFile(IAssetsFile assetsFile, string fileName);
 
 		AssetType ToExportType(ClassIDType unityType);
 		string GetExportID(Object @object);

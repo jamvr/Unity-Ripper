@@ -71,7 +71,10 @@ namespace UnityRipper.Classes
 
 				if (IsReadIndexFormat)
 				{
-					IndexFormat = stream.ReadInt32();
+					if(MeshCompression == 0)
+					{
+						IndexFormat = stream.ReadInt32();
+					}
 				}
 
 				m_indexBuffer = stream.ReadByteArray();

@@ -285,7 +285,7 @@ namespace UnityRipper
 
 				case ClassIDType.GlobalGameManager:
 				case ClassIDType.Material:
-				case ClassIDType.Texture:
+				case ClassIDType.Texture2D:
 				case ClassIDType.Mesh:
 				case ClassIDType.Shader:
 				case ClassIDType.TextAsset:

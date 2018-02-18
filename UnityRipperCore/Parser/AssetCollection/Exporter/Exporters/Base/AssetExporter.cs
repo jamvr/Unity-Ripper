@@ -9,7 +9,7 @@ namespace UnityRipper.AssetExporters
 	public abstract class AssetExporter : IAssetExporter
 	{
 		public abstract IExportCollection CreateCollection(Object @object);
-		public abstract void Export(IExportCollection collection, string dirPath);
+		public abstract bool Export(IExportCollection collection, string dirPath);
 		public abstract AssetType ToExportType(ClassIDType classID);
 
 		protected string GetUniqueFileName(Object @object, string dirPath)
@@ -32,6 +32,7 @@ namespace UnityRipper.AssetExporters
 			{
 				fileName = named.Name;
 			}
+			fileName = FixName(fileName);
 
 			fileName = DirectoryUtils.GetMaxIndexName(dirPath, fileName);
 			fileName = $"{fileName}.{@object.ExportExtension}";
@@ -43,6 +44,12 @@ namespace UnityRipper.AssetExporters
 			Meta meta = new Meta(collection);
 			string metaPath = $"{filePath}.meta";
 			YAMLExporter.Export(meta, metaPath, false);
+		}
+
+		protected string FixName(string path)
+		{
+			string fixedPath = path.Replace(':', '_');
+			return fixedPath;
 		}
 	}
 }

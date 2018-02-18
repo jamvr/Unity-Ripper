@@ -18,6 +18,7 @@ namespace UnityRipper.Classes
 					case ClassIDType.Shader:
 					case ClassIDType.Mesh:
 					case ClassIDType.Texture:
+					case ClassIDType.AnimationClip:
 					case ClassIDType.Avatar:
 					case ClassIDType.RuntimeAnimatorController:
 					case ClassIDType.MonoBehaviour:

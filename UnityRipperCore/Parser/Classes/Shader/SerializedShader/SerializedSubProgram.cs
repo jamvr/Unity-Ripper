@@ -1,15 +1,29 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using UnityRipper.AssetsFiles;
 
 namespace UnityRipper.Classes.Shaders
 {
 	public sealed class SerializedSubProgram : IStreamReadable
 	{
+		public SerializedSubProgram(IAssetsFile assetsFile)
+		{
+			if(assetsFile == null)
+			{
+				throw new Exception(nameof(assetsFile));
+			}
+			m_assetsFile = assetsFile;
+		}
+
 		public void Read(EndianStream stream)
 		{
 			BlobIndex = stream.ReadUInt32();
 			Channels.Read(stream);
 			m_keywordIndices = stream.ReadUInt16Array();
-			stream.AlignStream(AlignType.Align4);
+			if(IsAlignKeywordIndices)
+			{
+				stream.AlignStream(AlignType.Align4);
+			}
 
 			ShaderHardwareTier = stream.ReadByte();
 			GpuProgramType = stream.ReadByte();
@@ -17,12 +31,20 @@ namespace UnityRipper.Classes.Shaders
 
 			m_vectorParams = stream.ReadArray<VectorParameter>();
 			m_matrixParams = stream.ReadArray<MatrixParameter>();
-			m_textureParams = stream.ReadArray<TextureParameter>();
+			m_textureParams = stream.ReadArray(() => new TextureParameter(m_assetsFile));
 			m_bufferParams = stream.ReadArray<BufferBinding>();
-			m_constantBuffers = stream.ReadArray<ConstantBuffer>();
+			m_constantBuffers = stream.ReadArray(() => new ConstantBuffer(m_assetsFile));
 			m_constantBufferBindings = stream.ReadArray<BufferBinding>();
 			m_UAVParams = stream.ReadArray<UAVParameter>();
-			m_samplers = stream.ReadArray<SamplerParameter>();
+
+			if(IsReadSamplers)
+			{
+				m_samplers = stream.ReadArray<SamplerParameter>();
+			}
+			if(IsReadShaderRequirements)
+			{
+				ShaderRequirements = stream.ReadInt32();
+			}
 		}
 
 		public uint BlobIndex { get; private set; }
@@ -38,6 +60,25 @@ namespace UnityRipper.Classes.Shaders
 		public IReadOnlyList<BufferBinding> ConstantBufferBindings => m_constantBufferBindings;
 		public IReadOnlyList<UAVParameter> UAVParams => m_UAVParams;
 		public IReadOnlyList<SamplerParameter> Samplers => m_samplers;
+		public int ShaderRequirements { get; private set; }
+		
+		/// <summary>
+		/// 2017.1 and greater
+		/// </summary>
+		public bool IsReadSamplers => Version.IsGreaterEqual(2017, 1);
+		/// <summary>
+		/// 2017.2 and greater
+		/// </summary>
+		public bool IsReadShaderRequirements => Version.IsGreaterEqual(2017, 2);
+
+		/// <summary>
+		/// 2017.1 and greater
+		/// </summary>
+		private bool IsAlignKeywordIndices => Version.IsGreaterEqual(2017, 1);
+
+		private Version Version => m_assetsFile.Version;
+
+		private readonly IAssetsFile m_assetsFile;
 
 		private ushort[] m_keywordIndices;
 		private VectorParameter[] m_vectorParams;

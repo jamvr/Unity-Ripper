@@ -31,9 +31,9 @@ namespace UnityRipper.Bundles
 			m_length = length;
 		}
 
-		public AssetsFile ParseAssetsFile(IAssetCollection collection)
+		public AssetsFile ParseAssetsFile(IAssetCollection collection, string filePath)
 		{
-			AssetsFile assetsFile = new AssetsFile(collection, string.Empty, Name);
+			AssetsFile assetsFile = new AssetsFile(collection, filePath, Name);
 			m_stream.Position = m_offset;
 			assetsFile.Parse(m_stream);
 			long read = m_stream.Position - m_offset;
@@ -42,6 +42,19 @@ namespace UnityRipper.Bundles
 				//throw new Exception($"Read {read} but expected {m_length}");
 			}
 			return assetsFile;
+		}
+
+		public ResourcesFile ParseResourcesFile(string filePath)
+		{
+			byte[] buffer = new byte[m_length];
+			m_stream.Position = m_offset;
+			int read = m_stream.Read(buffer, 0, buffer.Length);
+			if(read != m_length)
+			{
+				throw new Exception($"Can't read {m_length} bytes from resource file. Read only {read} bytes");
+			}
+			ResourcesFile resesFile = new ResourcesFile(filePath, Name, buffer);
+			return resesFile;
 		}
 
 		public override string ToString()
@@ -58,11 +71,11 @@ namespace UnityRipper.Bundles
 				{
 					return false;
 				}
-				if (ext == ResourceExtntion)
+				if (ext == ResourceExtension)
 				{
 					return false;
 				}
-				if (ext == ResExtntion)
+				if (ext == ResExtension)
 				{
 					return false;
 				}
@@ -77,7 +90,7 @@ namespace UnityRipper.Bundles
 		private readonly long m_length;
 
 		private const string ManifestExtention = ".manifest";
-		private const string ResourceExtntion = ".resource";
-		private const string ResExtntion = ".resS";
+		private const string ResourceExtension = ".resource";
+		private const string ResExtension = ".resS";
 	}
 }

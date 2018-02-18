@@ -1,7 +1,19 @@
-﻿namespace UnityRipper.Classes.Shaders
+﻿using System;
+using UnityRipper.AssetsFiles;
+
+namespace UnityRipper.Classes.Shaders
 {
 	public sealed class SerializedShaderState : IStreamReadable
 	{
+		public SerializedShaderState(IAssetsFile assetsFile)
+		{
+			if (assetsFile == null)
+			{
+				throw new Exception(nameof(assetsFile));
+			}
+			m_assetsFile = assetsFile;
+		}
+
 		public void Read(EndianStream stream)
 		{
 			Name = stream.ReadStringAligned();
@@ -16,6 +28,10 @@
 			RtSeparateBlend = stream.ReadBoolean();
 			stream.AlignStream(AlignType.Align4);
 
+			if(IsReadZClip)
+			{
+				ZClip.Read(stream);
+			}
 			ZTest.Read(stream);
 			ZWrite.Read(stream);
 			Culling.Read(stream);
@@ -51,6 +67,7 @@
 		public SerializedShaderRTBlendState RtBlend6 { get; } = new SerializedShaderRTBlendState();
 		public SerializedShaderRTBlendState RtBlend7 { get; } = new SerializedShaderRTBlendState();
 		public bool RtSeparateBlend { get; private set; }
+		public SerializedShaderFloatValue ZClip { get; } = new SerializedShaderFloatValue();
 		public SerializedShaderFloatValue ZTest { get; } = new SerializedShaderFloatValue();
 		public SerializedShaderFloatValue ZWrite { get; } = new SerializedShaderFloatValue();
 		public SerializedShaderFloatValue Culling { get; } = new SerializedShaderFloatValue();
@@ -72,5 +89,14 @@
 		public SerializedTagMap Tags { get; } = new SerializedTagMap();
 		public int LOD { get; private set; }
 		public bool Lighting { get; private set; }
+
+		/// <summary>
+		/// 2017.2 and greater
+		/// </summary>
+		public bool IsReadZClip => Version.IsGreaterEqual(2017, 2);
+
+		private Version Version => m_assetsFile.Version;
+
+		private readonly IAssetsFile m_assetsFile;
 	}
 }

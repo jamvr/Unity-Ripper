@@ -4,7 +4,7 @@ namespace UnityRipper.Classes
 {
 	public abstract class RuntimeAnimatorController : NamedObject
 	{
-		public RuntimeAnimatorController(AssetInfo assetInfo) :
+		protected RuntimeAnimatorController(AssetInfo assetInfo) :
 			base(assetInfo)
 		{
 		}
