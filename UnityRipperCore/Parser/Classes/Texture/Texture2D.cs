@@ -14,7 +14,7 @@ namespace UnityRipper.Classes
 		public Texture2D(AssetInfo assetInfo) :
 			base(assetInfo)
 		{
-			TextureSettings = new GLTextureSettings(assetInfo.AssetFile);
+			TextureSettings = new TextureSettings(assetInfo.AssetFile);
 			if(IsReadStreamData)
 			{
 				StreamData = new StreamingInfo();
@@ -154,15 +154,6 @@ namespace UnityRipper.Classes
 
 		private byte[] ExportDDS(byte[] data, int offset, int length)
 		{
-			if (IsSwapBytes)
-			{
-				byte[] swapedBytes = new byte[data.Length];
-				for (int i = offset, j = offset + length - 1; j >= offset; i++, j--)
-				{
-					swapedBytes[j] = data[i];
-				}
-				data = swapedBytes;
-			}
 			PrepareForDDSExport(ref data, ref offset, ref length);
 
 			DDSConvertParameters @params = new DDSConvertParameters()
@@ -182,7 +173,7 @@ namespace UnityRipper.Classes
 				Caps = DDSCaps,
 			};
 
-			return DDSConverter.ConvertToDDS(data, offset, @params);
+			return DDSConverter.WrapToDDS(data, offset, @params);
 		}
 
 		private byte[] ExportPVR(byte[] data, int offset, int length)
@@ -196,7 +187,7 @@ namespace UnityRipper.Classes
 				MipMapCount = MipCount,
 			};
 
-			return PVRConverter.ConvertToPVR(data, offset, @params);
+			return PVRConverter.WraptToPVR(data, offset, @params);
 		}
 
 		private byte[] ExportKTX(byte[] data, int offset, int length)
@@ -210,12 +201,22 @@ namespace UnityRipper.Classes
 				Height = Height,
 			};
 
-			return KTXConverter.ConvertToKXT(data, offset, @params);
+			return KTXConverter.WrapToKXT(data, offset, @params);
 		}
 
 		private void PrepareForDDSExport(ref byte[] data, ref int offset, ref int length)
 		{
-			switch(TextureFormat)
+			if (IsSwapBytes)
+			{
+				byte[] swapedBytes = new byte[data.Length];
+				for (int i = offset, j = offset + length - 1; j >= offset; i++, j--)
+				{
+					swapedBytes[j] = data[i];
+				}
+				data = swapedBytes;
+			}
+
+			switch (TextureFormat)
 			{
 				case TextureFormat.Alpha8:
 					{
@@ -403,59 +404,12 @@ namespace UnityRipper.Classes
 				}
 			}
 		}
-
-		public int ForcedFallbackFormat { get; private set; }
-		public bool DownscaleFallback { get; private set; }
-		public int Width { get; private set; }
-		public int Height { get; private set; }
-		public int CompleteImageSize { get; private set; }
-		public TextureFormat TextureFormat { get; private set; }
-		public int MipCount { get; private set; }
-		public bool MipMap { get; private set; }
-		public bool IsReadable { get; private set; }
-		public bool ReadAllowed { get; private set; }
-		public int ImageCount { get; private set; }
-		public int TextureDimension { get; private set; }
-		public GLTextureSettings TextureSettings { get; }
-		public int LightmapFormat { get; private set; }
-		public int ColorSpace { get; private set; }
-		public IReadOnlyCollection<byte> ImageData => m_imageData;
-		public StreamingInfo StreamData { get; }
-
-		/// <summary>
-		/// 2017.3 and greater
-		/// </summary>
-		public bool IsReadFallbackFormat => Version.IsGreaterEqual(2017, 3);
-		/// <summary>
-		/// Less than 5.2.0
-		/// </summary>
-		public bool IsBoolMinMap => Version.IsLess(5, 2);
-		/// <summary>
-		/// 2.6.0 and greater
-		/// </summary>
-		public bool IsReadIsReadable => Version.IsGreaterEqual(2, 6);
-		/// <summary>
-		/// From 3.0.0 to 5.5.0 exclusive
-		/// </summary>
-		public bool IsReadReadAllowed => Version.IsGreaterEqual(3) && Version.IsLess(5, 5);
-		/// <summary>
-		/// 3.0.0 and greater
-		/// </summary>
-		public bool IsReadLightmapFormat => Version.IsGreaterEqual(3);
-		/// <summary>
-		/// 3.5.0 and greater
-		/// </summary>
-		public bool IsReadColorSpace => Version.IsGreaterEqual(3, 5);
-		/// <summary>
-		/// 5.3.0 and greater
-		/// </summary>
-		public bool IsReadStreamData => Version.IsGreaterEqual(5, 3);
-
+		
 		private bool DDSIsPitchOrLinearSize
 		{
 			get
 			{
-				if(MipMap)
+				if (MipMap)
 				{
 					switch (TextureFormat)
 					{
@@ -509,9 +463,11 @@ namespace UnityRipper.Classes
 				{
 					case TextureFormat.DXT1:
 					case TextureFormat.DXT1Crunched:
+						// ASCII - 'DXT1'
 						return 0x31545844;
 					case TextureFormat.DXT5:
 					case TextureFormat.DXT5Crunched:
+						// ASCII - 'DXT5'
 						return 0x35545844;
 
 					default:
@@ -524,7 +480,7 @@ namespace UnityRipper.Classes
 		{
 			get
 			{
-				switch(TextureFormat)
+				switch (TextureFormat)
 				{
 					case TextureFormat.ARGB4444:
 						//return 32;
@@ -716,9 +672,9 @@ namespace UnityRipper.Classes
 		{
 			get
 			{
-				if(IsBoolMinMap)
+				if (IsBoolMinMap)
 				{
-					if(!MipMap)
+					if (!MipMap)
 					{
 						return DDSCapsFlags.DDSCAPS_TEXTURE;
 					}
@@ -731,9 +687,9 @@ namespace UnityRipper.Classes
 		{
 			get
 			{
-				if(Platform == Platform.XBox360)
+				if (Platform == Platform.XBox360)
 				{
-					switch(TextureFormat)
+					switch (TextureFormat)
 					{
 						case TextureFormat.ARGB4444:
 						case TextureFormat.RGB565:
@@ -752,7 +708,7 @@ namespace UnityRipper.Classes
 		{
 			get
 			{
-				switch(TextureFormat)
+				switch (TextureFormat)
 				{
 					case TextureFormat.RHalf:
 						return KTXInternalFormat.R16F;
@@ -950,6 +906,57 @@ namespace UnityRipper.Classes
 				}
 			}
 		}
+
+		public int ForcedFallbackFormat { get; private set; }
+		public bool DownscaleFallback { get; private set; }
+		public int Width { get; private set; }
+		public int Height { get; private set; }
+		public int CompleteImageSize { get; private set; }
+		public TextureFormat TextureFormat { get; private set; }
+		public int MipCount { get; private set; }
+		public bool MipMap { get; private set; }
+		public bool IsReadable { get; private set; }
+		public bool ReadAllowed { get; private set; }
+		public int ImageCount { get; private set; }
+		/// <summary>
+		/// TextureDimension enum has beed changed at least one time
+		/// so it's impossible to cast to enum directly
+		/// </summary>
+		public int TextureDimension { get; private set; }
+		public TextureSettings TextureSettings { get; }
+		public int LightmapFormat { get; private set; }
+		public int ColorSpace { get; private set; }
+		public IReadOnlyCollection<byte> ImageData => m_imageData;
+		public StreamingInfo StreamData { get; }
+
+		/// <summary>
+		/// 2017.3 and greater
+		/// </summary>
+		public bool IsReadFallbackFormat => Version.IsGreaterEqual(2017, 3);
+		/// <summary>
+		/// Less than 5.2.0
+		/// </summary>
+		public bool IsBoolMinMap => Version.IsLess(5, 2);
+		/// <summary>
+		/// 2.6.0 and greater
+		/// </summary>
+		public bool IsReadIsReadable => Version.IsGreaterEqual(2, 6);
+		/// <summary>
+		/// From 3.0.0 to 5.5.0 exclusive
+		/// </summary>
+		public bool IsReadReadAllowed => Version.IsGreaterEqual(3) && Version.IsLess(5, 5);
+		/// <summary>
+		/// 3.0.0 and greater
+		/// </summary>
+		public bool IsReadLightmapFormat => Version.IsGreaterEqual(3);
+		/// <summary>
+		/// 3.5.0 and greater
+		/// </summary>
+		public bool IsReadColorSpace => Version.IsGreaterEqual(3, 5);
+		/// <summary>
+		/// 5.3.0 and greater
+		/// </summary>
+		public bool IsReadStreamData => Version.IsGreaterEqual(5, 3);
 
 		private byte[] m_imageData;
 	}

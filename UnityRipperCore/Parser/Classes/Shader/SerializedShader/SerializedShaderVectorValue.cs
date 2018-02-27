@@ -11,6 +11,8 @@
 			Name = stream.ReadStringAligned();
 		}
 
+		public bool IsZero => X.IsZero && Y.IsZero && Z.IsZero && W.IsZero;
+
 		public SerializedShaderFloatValue X { get; } = new SerializedShaderFloatValue();
 		public SerializedShaderFloatValue Y { get; } = new SerializedShaderFloatValue();
 		public SerializedShaderFloatValue Z { get; } = new SerializedShaderFloatValue();

@@ -4,16 +4,16 @@ namespace UnityRipper.Converter.Textures.KTX
 {
 	public static class KTXConverter
 	{
-		public static byte[] ConvertToKXT(byte[] data, int offset, KTXConvertParameters @params)
+		public static byte[] WrapToKXT(byte[] data, int offset, KTXConvertParameters @params)
 		{
 			using (MemoryStream stream = new MemoryStream(data))
 			{
 				stream.Position = offset;
-				return ConvertToKXT(stream, @params);
+				return WrapToKXT(stream, @params);
 			}
 		}
 
-		public static byte[] ConvertToKXT(Stream stream, KTXConvertParameters @params)
+		public static byte[] WrapToKXT(Stream stream, KTXConvertParameters @params)
 		{
 			byte[] buffer = new byte[HeaderSize + @params.DataLength];
 			using (MemoryStream memStream = new MemoryStream(buffer))

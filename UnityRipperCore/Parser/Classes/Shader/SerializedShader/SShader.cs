@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using UnityRipper.Classes.Shaders;
 using UnityRipper.Exporter.YAML;
@@ -24,13 +25,46 @@ namespace UnityRipper.Classes
 			base.Read(stream);
 
 			ParsedForm.Read(stream);
-			Name = ParsedForm.Name.Replace("/", "_");
-			m_platforms = stream.ReadUInt32Array();
-			m_offsets = stream.ReadUInt32Array();
-			m_compressedLengths = stream.ReadUInt32Array();
-			m_decompressedLengths = stream.ReadUInt32Array();
-			m_compressedBlob = stream.ReadByteArray();
+			Name = ParsedForm.Name;
+			
+			m_platforms = stream.ReadEnum32Array((t) => (GPUPlatform)t);
+			uint[] offsets = stream.ReadUInt32Array();
+			uint[] compressedLengths = stream.ReadUInt32Array();
+			uint[] decompressedLengths = stream.ReadUInt32Array();
+			byte[] compressedBlob = stream.ReadByteArray();
 			stream.AlignStream(AlignType.Align4);
+
+			m_subProgramBlobs = new ShaderSubProgramBlob[m_platforms.Length];
+			using (MemoryStream memStream = new MemoryStream(compressedBlob))
+			{
+				for(int i = 0; i < m_platforms.Length; i++)
+				{
+					uint offset = offsets[i];
+					uint compressedLength = compressedLengths[i];
+					uint decompressedLength = decompressedLengths[i];
+
+					memStream.Position = offset;
+					byte[] decompressedBuffer = new byte[decompressedLength];
+					using (Lz4Stream lz4Stream = new Lz4Stream(memStream, (int)compressedLength))
+					{
+						int read = lz4Stream.Read(decompressedBuffer, 0, decompressedBuffer.Length);
+						if (read != decompressedLength)
+						{
+							throw new Exception($"Can't properly decode shader blob. Read {read} but expected {decompressedLength}");
+						}
+					}
+
+					using (MemoryStream blobMem = new MemoryStream(decompressedBuffer))
+					{
+						using (EndianStream blobStream = new EndianStream(blobMem))
+						{
+							ShaderSubProgramBlob blob = new ShaderSubProgramBlob(AssetsFile);
+							blob.Read(blobStream);
+							m_subProgramBlobs[i] = blob;
+						}
+					}
+				}
+			}
 
 			m_dependencies = stream.ReadArray(() => new PPtr<SShader>(AssetsFile));
 			ShaderIsBaked = stream.ReadBoolean();
@@ -39,8 +73,9 @@ namespace UnityRipper.Classes
 
 		public override byte[] ExportBinary()
 		{
-#warning TODO: build text representation from binary parameters
-			return Encoding.UTF8.GetBytes("Not implemented yet");
+			StringBuilder sb = new StringBuilder();
+			ParsedForm.ToString(sb, this);			
+			return Encoding.UTF8.GetBytes(sb.ToString());
 		}
 
 		public override IEnumerable<Object> FetchDependencies(bool isLog = false)
@@ -74,19 +109,13 @@ namespace UnityRipper.Classes
 		public override string ExportExtension => "shader";
 		
 		public SerializedShader ParsedForm { get; }
-		public IReadOnlyList<uint> Platforms => m_platforms;
-		public IReadOnlyList<uint> Offsets => m_offsets;
-		public IReadOnlyList<uint> CompressedLengths => m_compressedLengths;
-		public IReadOnlyList<uint> DecompressedLengths => m_decompressedLengths;
-		public IReadOnlyList<byte> CompressedBlob => m_compressedBlob;
+		public IReadOnlyList<GPUPlatform> Platforms => m_platforms;
+		public IReadOnlyList<ShaderSubProgramBlob> SubProgramBlobs => m_subProgramBlobs;
 		public IReadOnlyList<PPtr<SShader>> Dependencies => m_dependencies;
 		public bool ShaderIsBaked { get; private set; }
 
-		private uint[] m_platforms;
-		private uint[] m_offsets;
-		private uint[] m_compressedLengths;
-		private uint[] m_decompressedLengths;
-		private byte[] m_compressedBlob;
+		private GPUPlatform[] m_platforms;
+		private ShaderSubProgramBlob[] m_subProgramBlobs;
 		private PPtr<SShader>[] m_dependencies = null;
 	}
 }

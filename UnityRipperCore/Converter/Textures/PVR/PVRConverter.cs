@@ -5,16 +5,16 @@ namespace UnityRipper.Converter.Textures.PVR
 #warning TODO: vertical flip?
 	public static class PVRConverter
 	{
-		public static byte[] ConvertToPVR(byte[] data, int offset, PVRConvertParameters @params)
+		public static byte[] WraptToPVR(byte[] data, int offset, PVRConvertParameters @params)
 		{
 			using (MemoryStream stream = new MemoryStream(data))
 			{
 				stream.Position = offset;
-				return ConvertToPVR(stream, @params);
+				return WrapToPVR(stream, @params);
 			}
 		}
 
-		public static byte[] ConvertToPVR(Stream stream, PVRConvertParameters @params)
+		public static byte[] WrapToPVR(Stream stream, PVRConvertParameters @params)
 		{
 			byte[] buffer = new byte[HeaderSize + @params.DataLength];
 			using (MemoryStream memStream = new MemoryStream(buffer))

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text;
 
 namespace UnityRipper.Classes.Shaders
 {
@@ -7,6 +8,17 @@ namespace UnityRipper.Classes.Shaders
 		public void Read(EndianStream stream)
 		{
 			m_props = stream.ReadArray<SerializedProperty>();
+		}
+
+		public StringBuilder ToString(StringBuilder sb)
+		{
+			sb.Append('\t').Append("Properties").Append(' ').Append('{').Append('\n');
+			foreach(SerializedProperty prop in Props)
+			{
+				prop.ToString(sb);
+			}
+			sb.Append('\t').Append('}').Append('\n');
+			return sb;
 		}
 
 		public IReadOnlyList<SerializedProperty> Props => m_props;

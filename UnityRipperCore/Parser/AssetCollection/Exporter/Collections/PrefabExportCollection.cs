@@ -10,10 +10,10 @@ namespace UnityRipper.AssetExporters
 {
 	public class PrefabExportCollection : AssetExportCollection
 	{
-		public PrefabExportCollection(IAssetExporter assetExporter, Prefab prefab, IEnumerable<Object> objects) :
+		public PrefabExportCollection(IAssetExporter assetExporter, Prefab prefab, IEnumerable<EditorExtension> objects) :
 			base(assetExporter, prefab)
 		{
-			foreach(Object @object in objects)
+			foreach(EditorExtension @object in objects)
 			{
 				AddObject(@object);
 			}
@@ -43,7 +43,7 @@ namespace UnityRipper.AssetExporters
 			}
 		}
 
-		private void AddObject(Object @object)
+		private void AddObject(EditorExtension @object)
 		{
 			if(@object == null)
 			{

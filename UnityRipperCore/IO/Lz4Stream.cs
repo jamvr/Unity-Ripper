@@ -394,7 +394,7 @@ namespace UnityRipper
 			int read = BaseStream.Read(m_inputBuffer, offset, count);
 			if (read == 0)
 			{
-#warning replace this place to m_pahse = Finish for partial reading
+#warning replace this place to m_phase = Finish for partial reading
 				throw new Exception("No data left");
 			}
 			if(read != count)

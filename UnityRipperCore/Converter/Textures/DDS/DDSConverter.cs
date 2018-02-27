@@ -1,19 +1,20 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 namespace UnityRipper.Converter.Textures.DDS
 {
 	public static class DDSConverter
 	{
-		public static byte[] ConvertToDDS(byte[] data, int offset, DDSConvertParameters @params)
+		public static byte[] WrapToDDS(byte[] data, int offset, DDSConvertParameters @params)
 		{
 			using (MemoryStream stream = new MemoryStream(data))
 			{
 				stream.Position = offset;
-				return ConvertToDDS(stream, @params);
+				return WrapToDDS(stream, @params);
 			}
 		}
 
-		public static byte[] ConvertToDDS(Stream stream, DDSConvertParameters @params)
+		public static byte[] WrapToDDS(Stream stream, DDSConvertParameters @params)
 		{
 			byte[] buffer = new byte[4 + HeaderSize + @params.DataLength];
 			using (MemoryStream memStream = new MemoryStream(buffer))
@@ -57,6 +58,9 @@ namespace UnityRipper.Converter.Textures.DDS
 			return buffer;
 		}
 
+		/// <summary>
+		/// ASCII 'DDS '
+		/// </summary>
 		private const uint MagicNumber = 0x20534444;
 		private const uint HeaderSize = 0x7C;
 

@@ -5,6 +5,18 @@ namespace UnityRipper
 {
 	public static class EndianStreamExtensions
 	{
+		public static T[] ReadEnum32Array<T>(this EndianStream stream, Func<int, T> converter)
+		{
+			int count = stream.ReadInt32();
+			T[] array = new T[count];
+			for (int i = 0; i < count; i++)
+			{
+				int value = stream.ReadInt32();
+				array[i] = converter(value);
+			}
+			return array;
+		}
+
 		public static KeyValuePair<int, uint>[] ReadInt32KVPUInt32Array(this EndianStream stream)
 		{
 			int count = stream.ReadInt32();

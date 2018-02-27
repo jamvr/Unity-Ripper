@@ -138,7 +138,7 @@ namespace UnityRipper.Classes
 
 		private bool IsReadHideFlag
 		{
-			get { return Platform == Platform.UnityPackage; }
+			get { return Platform == Platform.NoTarget; }
 		}
 
 		private readonly AssetInfo m_assetInfo;

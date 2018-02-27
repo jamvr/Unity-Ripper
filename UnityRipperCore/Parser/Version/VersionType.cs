@@ -7,8 +7,8 @@ namespace UnityRipper
 		Alpha = 0,
 		Beta,
 		Base,
-		Patch,
 		Final,
+		Patch,
 	}
 
 	public static class VersionTypeExtentions
@@ -25,12 +25,12 @@ namespace UnityRipper
 
 				case VersionType.Base:
 					return string.Empty;
-					
-				case VersionType.Patch:
-					return "p";
 
 				case VersionType.Final:
 					return "f";
+
+				case VersionType.Patch:
+					return "p";
 
 				default:
 					throw new Exception($"Unsupported vertion type {_this}");

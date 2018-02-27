@@ -5,6 +5,20 @@ namespace UnityRipper.Classes.Shaders
 {
 	public class StructParameter : IStreamReadable
 	{
+		public StructParameter()
+		{
+		}
+
+		public StructParameter(string name, int index, int arraySize, int structSize, VectorParameter[] vectors, MatrixParameter[] matrices)
+		{
+			Name = name;
+			Index = index;
+			ArraySize = arraySize;
+			StructSize = structSize;
+			m_vectorMembers = vectors;
+			m_matrixMembers = matrices;
+		}
+
 		public void Read(EndianStream stream)
 		{
 			NameIndex = stream.ReadInt32();
@@ -17,10 +31,11 @@ namespace UnityRipper.Classes.Shaders
 			stream.AlignStream(AlignType.Align4);
 		}
 
-		public int NameIndex { get; set; }
-		public int Index { get; set; }
-		public int ArraySize { get; set; }
-		public int StructSize { get; set; }
+		public string Name { get; private set; }
+		public int NameIndex { get; private set; }
+		public int Index { get; private set; }
+		public int ArraySize { get; private set; }
+		public int StructSize { get; private set; }
 		public IReadOnlyList<VectorParameter> VectorMembers => m_vectorMembers;
 		public IReadOnlyList<MatrixParameter> MatrixMembers => m_matrixMembers;
 

@@ -110,7 +110,7 @@ namespace UnityRipper.Classes
 		/// <summary>
 		/// Unity Package
 		/// </summary>
-		public bool IsReadScript => Platform == Platform.UnityPackage;
+		public bool IsReadScript => Platform == Platform.NoTarget;
 		/// <summary>
 		/// Less than 5.0.0
 		/// </summary>

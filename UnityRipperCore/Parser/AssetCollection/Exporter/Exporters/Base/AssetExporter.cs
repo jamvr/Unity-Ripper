@@ -49,6 +49,7 @@ namespace UnityRipper.AssetExporters
 		protected string FixName(string path)
 		{
 			string fixedPath = path.Replace(':', '_');
+			fixedPath = fixedPath.Replace('/', '_');
 			return fixedPath;
 		}
 	}

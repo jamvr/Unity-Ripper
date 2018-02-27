@@ -45,10 +45,6 @@ namespace UnityRipper.Classes
 			{
 				yield return PrefabParentObject.GetObject();
 			}
-			if(!PrefabInternal.IsNull)
-			{
-				yield return PrefabInternal.GetObject();
-			}
 		}
 		
 		public PPtr<EditorExtension> PrefabParentObject { get; }
@@ -57,7 +53,7 @@ namespace UnityRipper.Classes
 		/// <summary>
 		/// Unity Package
 		/// </summary>
-		public bool IsReadPrefab => Platform == Platform.UnityPackage;
+		public bool IsReadPrefab => Platform == Platform.NoTarget;
 		private bool IsWritePrefab => ClassID != ClassIDType.Prefab;
 	}
 }

@@ -8,6 +8,10 @@ namespace UnityRipper.Classes
 		public BuildSettings(AssetInfo assetInfo):
 			base(assetInfo)
 		{
+			if(IsReadBuildTags)
+			{
+				BuildGUID = new UnityGUID();
+			}
 		}
 
 		public override void Read(EndianStream stream)
@@ -20,11 +24,14 @@ namespace UnityRipper.Classes
 				m_preloadedPlugins = stream.ReadStringArray();
 			}
 
-			if (IsReadBuildTags)
+			if (IsReadEnabledVRDevices)
 			{
 				m_enabledVRDevices = stream.ReadStringArray();
-				m_buildTags = stream.ReadStringArray();
-				m_buildGUID.Read(stream);
+				if(IsReadBuildTags)
+				{
+					m_buildTags = stream.ReadStringArray();
+					BuildGUID.Read(stream);
+				}
 			}
 
 			// bool flags
@@ -38,21 +45,19 @@ namespace UnityRipper.Classes
 				HasPublishingRights = stream.ReadBoolean();
 				HasShadows = stream.ReadBoolean();
 				HasSoftShadows = stream.ReadBoolean();
-
-				if (IsReadMoreBoolFlags)
-				{
-					HasLocalLightShadows = stream.ReadBoolean();
-					HasAdvancedVersion = stream.ReadBoolean();
-					EnableDynamicBatching = stream.ReadBoolean();
-					IsDebugBuild = stream.ReadBoolean();
-					
-					if (IsReadEvenMoreBoolFlags)
-					{
-						UsesOnMouseEvents = stream.ReadBoolean();
-						HasClusterRendering = stream.ReadBoolean();
-						stream.AlignStream(AlignType.Align4);
-					}
-				}
+			}
+			if (IsReadMoreBoolFlags)
+			{
+				HasLocalLightShadows = stream.ReadBoolean();
+				HasAdvancedVersion = stream.ReadBoolean();
+				EnableDynamicBatching = stream.ReadBoolean();
+				IsDebugBuild = stream.ReadBoolean();
+			}
+			if (IsReadEvenMoreBoolFlags)
+			{
+				UsesOnMouseEvents = stream.ReadBoolean();
+				HasClusterRendering = stream.ReadBoolean();
+				stream.AlignStream(AlignType.Align4);
 			}
 
 			BSVersion = stream.ReadStringAligned();
@@ -75,6 +80,7 @@ namespace UnityRipper.Classes
 		public IReadOnlyList<string> PreloadedPlugins => m_preloadedPlugins;
 		public IReadOnlyList<string> EnabledVRDevices => m_enabledVRDevices;
 		public IReadOnlyList<string> BuildTags => m_buildTags;
+		public UnityGUID BuildGUID { get; }
 		public bool HasPROVersion { get; private set; }
 		public bool IsNoWatermarkBuild { get; private set; }
 		public bool IsPrototypingBuild { get; private set; }
@@ -99,10 +105,14 @@ namespace UnityRipper.Classes
 		/// 5.0.0 and greater
 		/// </summary>
 		private bool IsReadPreloadPlugin => Version.IsGreaterEqual(5);
-#warning unknown version
-		private bool IsReadEnabledVRDevices => Version.IsGreaterEqual(2017, 1);
-#warning unknown version
-		private bool IsReadBuildTags => Version.IsGreaterEqual(2017, 1);
+		/// <summary>
+		/// 5.4.0 and greater
+		/// </summary>
+		private bool IsReadEnabledVRDevices => Version.IsGreaterEqual(5, 4);
+		/// <summary>
+		/// 5.6.0 and greater
+		/// </summary>
+		private bool IsReadBuildTags => Version.IsGreaterEqual(5, 6);
 		/// <summary>
 		/// 3.0.0 and greater
 		/// </summary>
@@ -118,8 +128,6 @@ namespace UnityRipper.Classes
 
 		private readonly Dictionary<int, Hash128> m_runtimeClassHashes = new Dictionary<int, Hash128>();
 		private readonly Dictionary<Hash128, Hash128> m_scriptHashes = new Dictionary<Hash128, Hash128>();
-
-		private readonly UnityGUID m_buildGUID = new UnityGUID();
 
 		private string[] m_scenes;
 		private string[] m_preloadedPlugins;

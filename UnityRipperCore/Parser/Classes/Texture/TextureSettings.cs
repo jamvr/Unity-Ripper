@@ -3,9 +3,9 @@ using UnityRipper.AssetsFiles;
 
 namespace UnityRipper.Classes.Textures
 {
-	public class GLTextureSettings : IStreamReadable
+	public class TextureSettings : IStreamReadable
 	{
-		public GLTextureSettings(IAssetsFile assetsFile)
+		public TextureSettings(IAssetsFile assetsFile)
 		{
 			if(assetsFile == null)
 			{
@@ -21,23 +21,23 @@ namespace UnityRipper.Classes.Textures
 			MipBias = stream.ReadSingle();
 			if (IsReadWrapMode)
 			{
-				WrapMode = (WrapMode)stream.ReadInt32();
+				WrapMode = (TextureWrapMode)stream.ReadInt32();
 			}
 			else
 			{
-				WrapU = stream.ReadInt32();
-				WrapV = stream.ReadInt32();
-				WrapW = stream.ReadInt32();
+				WrapU = (TextureWrapMode)stream.ReadInt32();
+				WrapV = (TextureWrapMode)stream.ReadInt32();
+				WrapW = (TextureWrapMode)stream.ReadInt32();
 			}
 		}
 
 		public FilterMode FilterMode { get; private set; }
 		public int Aniso { get; private set; }
 		public float MipBias { get; private set; }
-		public WrapMode WrapMode { get; private set; }
-		public int WrapU { get; private set; }
-		public int WrapV { get; private set; }
-		public int WrapW { get; private set; }
+		public TextureWrapMode WrapMode { get; private set; }
+		public TextureWrapMode WrapU { get; private set; }
+		public TextureWrapMode WrapV { get; private set; }
+		public TextureWrapMode WrapW { get; private set; }
 		
 		/// <summary>
 		/// Less than 2017.1

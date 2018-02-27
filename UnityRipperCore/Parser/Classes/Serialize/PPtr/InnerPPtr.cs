@@ -3,18 +3,9 @@ using UnityRipper.Exporter.YAML;
 
 namespace UnityRipper.Classes
 {
-	public sealed class InnerPPtr<T> : IPPtr<T>
+	public abstract class InnerPPtr<T> : IPPtr<T>
 		where T: Object
 	{
-		public InnerPPtr(Prefab prefab)
-		{
-			if(prefab == null)
-			{
-				throw new ArgumentNullException(nameof(prefab));
-			}
-			m_prefab = prefab;
-		}
-
 		public void Read(EndianStream stream)
 		{
 			throw new NotSupportedException();
@@ -24,7 +15,7 @@ namespace UnityRipper.Classes
 		{
 			YAMLMappingNode node = new YAMLMappingNode();
 			node.Style = MappingStyle.Flow;
-			node.Add("fileID", m_prefab.ExportID);
+			node.Add("fileID", PathIDString);
 			return node;
 		}
 
@@ -38,8 +29,8 @@ namespace UnityRipper.Classes
 			throw new NotSupportedException();
 		}
 
-		public bool IsNull => true;
+		public bool IsNull => false;
 
-		private readonly Prefab m_prefab;
+		protected abstract string PathIDString { get; }
 	}
 }

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Globalization;
+using System.Text;
 using UnityRipper.AssetsFiles;
 
 namespace UnityRipper.Classes.Shaders
@@ -28,7 +30,7 @@ namespace UnityRipper.Classes.Shaders
 			RtSeparateBlend = stream.ReadBoolean();
 			stream.AlignStream(AlignType.Align4);
 
-			if(IsReadZClip)
+			if (IsReadZClip)
 			{
 				ZClip.Read(stream);
 			}
@@ -49,12 +51,127 @@ namespace UnityRipper.Classes.Shaders
 			FogDensity.Read(stream);
 			FogColor.Read(stream);
 
-			FogMode = stream.ReadInt32();
+			FogMode = (FogMode)stream.ReadInt32();
 			GpuProgramID = stream.ReadInt32();
 			Tags.Read(stream);
 			LOD = stream.ReadInt32();
 			Lighting = stream.ReadBoolean();
 			stream.AlignStream(AlignType.Align4);
+		}
+
+		public StringBuilder ToString(StringBuilder sb)
+		{
+			if (Name != string.Empty)
+			{
+				sb.AppendIntent(3).Append("Name").Append(' ');
+				sb.Append('"').Append(Name).Append('"');
+				sb.Append('\n');
+			}
+			if (LOD != 0)
+			{
+				sb.AppendIntent(3).Append("LOD").Append(' ').Append(LOD).Append('\n');
+			}
+			Tags.ToString(sb, 3);
+			
+			RtBlend0.ToString(sb, RtSeparateBlend ? 0 : -1);
+			RtBlend1.ToString(sb, 1);
+			RtBlend2.ToString(sb, 2);
+			RtBlend3.ToString(sb, 3);
+			RtBlend4.ToString(sb, 4);
+			RtBlend5.ToString(sb, 5);
+			RtBlend6.ToString(sb, 6);
+			RtBlend7.ToString(sb, 7);
+
+			if (AlphaToMaskValue)
+			{
+				sb.AppendIntent(3).Append("AlphaToMask").Append(' ').Append("On").Append('\n');
+			}
+
+			if (!ZClipValue.IsOn())
+			{
+				sb.AppendIntent(3).Append("ZClip").Append(' ').Append(ZClipValue).Append('\n');
+			}
+			if (!ZTestValue.IsLEqual())
+			{
+				sb.AppendIntent(3).Append("ZTest").Append(' ').Append(ZTestValue).Append('\n');
+			}
+			if (!ZWriteValue.IsOn())
+			{
+				sb.AppendIntent(3).Append("ZWrite").Append(' ').Append(ZWriteValue).Append('\n');
+			}
+			if (!CullingValue.IsBack())
+			{
+				sb.AppendIntent(3).Append("Cull").Append(' ').Append(CullingValue).Append('\n');
+			}
+			if (!OffsetFactor.IsZero || !OffsetUnits.IsZero)
+			{
+				sb.AppendIntent(3).Append("Offset").Append(' ').Append(OffsetFactor.Val).Append(',').Append(' ').Append(OffsetUnits.Val).Append('\n');
+			}
+
+			if (!StencilRef.IsZero || !StencilReadMask.IsMax || !StencilWriteMask.IsMax || !StencilOp.IsDefault || !StencilOpFront.IsDefault || !StencilOpBack.IsDefault)
+			{
+				sb.AppendIntent(3).Append("Stencil").Append(' ').Append('{').Append('\n');
+				if(!StencilRef.IsZero)
+				{
+					sb.AppendIntent(4).Append("Ref").Append(' ').Append(StencilRef.Val).Append('\n');
+				}
+				if(!StencilReadMask.IsMax)
+				{
+					sb.AppendIntent(4).Append("ReadMask").Append(' ').Append(StencilReadMask.Val).Append('\n');
+				}
+				if(!StencilWriteMask.IsMax)
+				{
+					sb.AppendIntent(4).Append("WriteMask").Append(' ').Append(StencilWriteMask.Val).Append('\n');
+				}
+				if(!StencilOp.IsDefault)
+				{
+					StencilOp.ToString(sb, StencilType.Base);
+				}
+				if(!StencilOpFront.IsDefault)
+				{
+					StencilOpFront.ToString(sb, StencilType.Front);
+				}
+				if(!StencilOpBack.IsDefault)
+				{
+					StencilOpBack.ToString(sb, StencilType.Back);
+				}
+				sb.AppendIntent(3).Append('}').Append('\n');
+			}
+			
+			if(!FogMode.IsUnknown() || !FogColor.IsZero || !FogDensity.IsZero || !FogStart.IsZero || !FogEnd.IsZero)
+			{
+				sb.AppendIntent(3).Append("Fog").Append(' ').Append('{').Append('\n');
+				if(!FogMode.IsUnknown())
+				{
+					sb.AppendIntent(4).Append("Mode").Append(' ').Append(FogMode).Append('\n');
+				}
+				if (!FogColor.IsZero)
+				{
+					sb.AppendIntent(4).Append("Color").Append(' ').Append('(');
+					sb.Append(FogColor.X.Val.ToString(CultureInfo.InvariantCulture)).Append(',');
+					sb.Append(FogColor.Y.Val.ToString(CultureInfo.InvariantCulture)).Append(',');
+					sb.Append(FogColor.Z.Val.ToString(CultureInfo.InvariantCulture)).Append(',');
+					sb.Append(FogColor.W.Val.ToString(CultureInfo.InvariantCulture));
+					sb.Append(')').Append('\n');
+				}
+				if (!FogDensity.IsZero)
+				{
+					sb.AppendIntent(4).Append("Density").Append(' ').Append(FogDensity.Val.ToString(CultureInfo.InvariantCulture)).Append('\n');
+				}
+				if (!FogStart.IsZero ||!FogEnd.IsZero)
+				{
+					sb.AppendIntent(4).Append("Range").Append(' ').Append(FogStart.Val.ToString(CultureInfo.InvariantCulture)).Append(',');
+					sb.Append(' ').Append(FogEnd.Val.ToString(CultureInfo.InvariantCulture)).Append('\n');
+				}
+				sb.AppendIntent(3).Append('}').Append('\n');
+			}
+
+			if(Lighting)
+			{
+				sb.AppendIntent(3).Append("Lighting").Append(' ').Append(LightingValue).Append('\n');
+			}
+			sb.AppendIntent(3).Append("GpuProgramID").Append(' ').Append(GpuProgramID).Append('\n');
+			return sb;
 		}
 
 		public string Name { get; private set; }
@@ -84,11 +201,18 @@ namespace UnityRipper.Classes.Shaders
 		public SerializedShaderFloatValue FogEnd { get; } = new SerializedShaderFloatValue();
 		public SerializedShaderFloatValue FogDensity { get; } = new SerializedShaderFloatValue();
 		public SerializedShaderVectorValue FogColor { get; } = new SerializedShaderVectorValue();
-		public int FogMode { get; private set; }
+		public FogMode FogMode { get; private set; }
 		public int GpuProgramID { get; private set; }
 		public SerializedTagMap Tags { get; } = new SerializedTagMap();
 		public int LOD { get; private set; }
 		public bool Lighting { get; private set; }
+
+		private ZClip ZClipValue => (ZClip)ZClip.Val;
+		private ZTest ZTestValue => (ZTest)ZTest.Val;
+		private ZWrite ZWriteValue => (ZWrite)ZWrite.Val;
+		private Cull CullingValue => (Cull)Culling.Val;
+		private bool AlphaToMaskValue => AlphaToMask.Val > 0;
+		private string LightingValue => Lighting ? "On" : "Off";
 
 		/// <summary>
 		/// 2017.2 and greater

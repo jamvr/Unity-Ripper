@@ -255,11 +255,7 @@ namespace UnityRipper
 
 		public override string ToString()
 		{
-			string result = $"{Major}.{Minor}";
-			if(Build != 0)
-			{
-				result = $"{result}.{Build}";
-			}
+			string result = $"{Major}.{Minor}.{Build}";
 			if(Type != VersionType.Base)
 			{
 				result = $"{result}{Type.ToLiteral()}{TypeNumber}";
@@ -314,7 +310,7 @@ namespace UnityRipper
 			{
 				return false;
 			}
-			return Minor < major;
+			return Minor < minor;
 		}
 
 		public bool IsLess(int major, int minor, int build)

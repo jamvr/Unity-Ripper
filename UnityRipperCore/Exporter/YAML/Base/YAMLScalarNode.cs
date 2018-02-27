@@ -78,7 +78,7 @@ namespace UnityRipper.Exporter.YAML
 			this()
 		{
 			SetValue(value);
-			Style = ScalarStyle.Plain;
+			Style = GetStyle(value);
 		}
 
 		public void SetValue(bool value)
@@ -167,6 +167,15 @@ namespace UnityRipper.Exporter.YAML
 				default:
 					throw new Exception($"Unsupported scalar style {Style}");
 			}
+		}
+
+		private ScalarStyle GetStyle(string value)
+		{
+			if(value.Contains(":"))
+			{
+				return ScalarStyle.SingleQuoted;
+			}
+			return ScalarStyle.Plain;
 		}
 
 		public static readonly YAMLScalarNode Empty = new YAMLScalarNode();

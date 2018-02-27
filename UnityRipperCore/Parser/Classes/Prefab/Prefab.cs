@@ -16,7 +16,7 @@ namespace UnityRipper.Classes
 			Modification = new PrefabModification(AssetsFile);
 			ParentPrefab = new PPtr<Prefab>(AssetsFile);
 			RootGameObject = new PPtr<GameObject>(AssetsFile);
-			ThisPrefab = new InnerPPtr<Prefab>(this);
+			ThisPrefab = new PrefabPtr(this);
 		}
 
 		public Prefab(GameObject root) :
@@ -25,7 +25,7 @@ namespace UnityRipper.Classes
 			Modification = new PrefabModification(AssetsFile);
 			ParentPrefab = new PPtr<Prefab>(AssetsFile);
 			RootGameObject = new PPtr<GameObject>(root);
-			ThisPrefab = new InnerPPtr<Prefab>(this);
+			ThisPrefab = new PrefabPtr(this);
 			IsPrefabParent = true;
 			ObjectHideFlags = 1;
 
@@ -51,6 +51,7 @@ namespace UnityRipper.Classes
 			RootGameObject.Read(stream);
 			IsPrefabParent = stream.ReadBoolean();
 			stream.AlignStream(AlignType.Align64);
+			throw new NotSupportedException("Currently EditorExtension's PrefabInternal field doesn't support Unity's prefabs");
 		}
 
 		public IEnumerable<EditorExtension> FetchObjects(bool isLog = false)

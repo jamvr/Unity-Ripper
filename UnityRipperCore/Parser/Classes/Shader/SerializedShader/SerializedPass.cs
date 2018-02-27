@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using UnityRipper.AssetsFiles;
 
 namespace UnityRipper.Classes.Shaders
@@ -24,7 +25,7 @@ namespace UnityRipper.Classes.Shaders
 		public void Read(EndianStream stream)
 		{
 			m_nameIndices.Read(stream);
-			Type = stream.ReadInt32();
+			Type = (SerializedPassType)stream.ReadInt32();
 			State.Read(stream);
 			ProgramMask = stream.ReadUInt32();
 			ProgVertex.Read(stream);
@@ -40,9 +41,51 @@ namespace UnityRipper.Classes.Shaders
 			TextureName = stream.ReadStringAligned();
 			Tags.Read(stream);
 		}
+
+		public StringBuilder ToString(StringBuilder sb, SShader shader)
+		{
+			sb.AppendIntent(2).Append(Type.ToString()).Append(' ');
+
+			if (Type == SerializedPassType.UsePass)
+			{
+				sb.Append('"').Append(UseName).Append('"').Append('\n');
+			}
+			else
+			{
+				sb.Append('{').Append('\n');
+				
+				if (Type == SerializedPassType.GrabPass)
+				{
+					if(TextureName != string.Empty)
+					{
+						sb.AppendIntent(3).Append('"').Append(TextureName).Append('"').Append('\n');
+					}
+				}
+				else if (Type == SerializedPassType.Pass)
+				{
+					State.ToString(sb);
+
+					ProgVertex.ToString(sb, shader, ShaderType.Vertex);
+					ProgFragment.ToString(sb, shader, ShaderType.Fragment);
+					ProgGeometry.ToString(sb, shader, ShaderType.Geometry);
+					ProgHull.ToString(sb, shader, ShaderType.Hull);
+					ProgDomain.ToString(sb, shader, ShaderType.Domain);
+
+#warning ProgramMask?
+#warning HasInstancingVariant?
+				}
+				else
+				{
+					throw new NotSupportedException($"Unsupported pass type {Type}");
+				}
+
+				sb.AppendIntent(2).Append('}').Append('\n');
+			}
+			return sb;
+		}
 		
-		public IDictionary<string, int> NameIndices => m_nameIndices;
-		public int Type { get; private set; }
+		public IReadOnlyDictionary<string, int> NameIndices => m_nameIndices;
+		public SerializedPassType Type { get; private set; }
 		public SerializedShaderState State { get; }
 		public uint ProgramMask { get; private set; }
 		public SerializedProgram ProgVertex { get; }

@@ -68,7 +68,6 @@ namespace UnityRipper
 				if(file.FilePath == filepath)
 				{
 					m_files.RemoveAt(i);
-					m_ifiles.RemoveAt(i);
 					i--;
 				}
 			}
@@ -171,7 +170,6 @@ namespace UnityRipper
 			}
 			
 			m_files.Add(file);
-			m_ifiles.Add(file);
 		}
 
 		private void FillVersion(AssetsFile file)
@@ -187,10 +185,9 @@ namespace UnityRipper
 		}
 		
 		public AssetsExporter Exporter { get; } = new AssetsExporter();
-		public IReadOnlyList<IAssetsFile> AssetsFiles => m_ifiles;
+		public IReadOnlyList<IAssetsFile> AssetsFiles => m_files;
 
 		private readonly List<AssetsFile> m_files = new List<AssetsFile>();
-		private readonly List<IAssetsFile> m_ifiles = new List<IAssetsFile>();
 		private readonly List<ResourcesFile> m_resources = new List<ResourcesFile>();
 	}
 }

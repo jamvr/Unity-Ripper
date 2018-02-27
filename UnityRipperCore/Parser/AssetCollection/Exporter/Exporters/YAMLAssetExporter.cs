@@ -27,7 +27,7 @@ namespace UnityRipper.AssetExporters
 			{
 				GameObject go = (GameObject)@object;
 				Prefab prefab = new Prefab(go);
-				IEnumerable<Object> prefabContent = EnumeratePrefabContent(prefab);
+				IEnumerable<EditorExtension> prefabContent = EnumeratePrefabContent(prefab);
 				PrefabExportCollection collection = new PrefabExportCollection(this, prefab, prefabContent);
 				return collection;
 			}
@@ -80,7 +80,7 @@ namespace UnityRipper.AssetExporters
 			}
 		}
 
-		private IEnumerable<Object> EnumeratePrefabContent(Prefab prefab)
+		private IEnumerable<EditorExtension> EnumeratePrefabContent(Prefab prefab)
 		{
 			foreach(EditorExtension @object in prefab.FetchObjects())
 			{

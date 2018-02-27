@@ -13,7 +13,7 @@ namespace UnityRipper.Classes
 		{
 			if (IsEncoded)
 			{
-				SubProgramBlob = new ShaderSubProgramBlob();
+				SubProgramBlob = new ShaderSubProgramBlob(AssetsFile);
 			}
 		}
 
@@ -42,10 +42,10 @@ namespace UnityRipper.Classes
 					{
 						using (Lz4Stream lz4Stream = new Lz4Stream(memStream))
 						{
-							int read = lz4Stream.Read(decompressedBuffer, 0, (int)decompressedSize);
+							int read = lz4Stream.Read(decompressedBuffer, 0, decompressedBuffer.Length);
 							if (read != decompressedSize)
 							{
-								throw new Exception($"Can't properly decode sub porgram prob. Read {read} but expected decompressedSize");
+								throw new Exception($"Can't properly decode sub porgram blob. Read {read} but expected {decompressedSize}");
 							}
 						}
 					}
@@ -69,23 +69,9 @@ namespace UnityRipper.Classes
 		{
 			if (IsEncoded)
 			{
-				StringBuilder builder = new StringBuilder();
-				builder.Append(Script).AppendLine();
-				if (SubProgramBlob.SubPrograms.Length != 0)
-				{
-					builder.AppendLine("WARNING!!! THIS SHADER ISN'T VALID").AppendLine();
-				}
-
-#warning TODO: implement shader builder
-				foreach (ShaderSubProgram subProgram in SubProgramBlob.SubPrograms)
-				{
-					if (string.IsNullOrEmpty(subProgram.ProgramData))
-					{
-						continue;
-					}
-					builder.AppendLine().Append(subProgram.ProgramData);
-				}
-				return Encoding.UTF8.GetBytes(builder.ToString());
+				StringBuilder sb = new StringBuilder();
+				SubProgramBlob.ToString(sb, Script);
+				return Encoding.UTF8.GetBytes(sb.ToString());
 			}
 			else
 			{

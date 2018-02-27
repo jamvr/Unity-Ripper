@@ -14,6 +14,26 @@ namespace UnityRipper.Classes.Shaders
 			m_assetsFile = assetsFile;
 		}
 
+		public TextureParameter(IAssetsFile assetsFile, string name, int index, int dimension) :
+			this(assetsFile)
+		{
+			Name = name;
+			NameIndex = -1;
+			Index = index;
+			Dim = (byte)dimension;
+			SamplerIndex = dimension >> 8;
+			if (SamplerIndex == 0xFFFFFF)
+			{
+				SamplerIndex = -1;
+			}
+		}
+
+		public TextureParameter(IAssetsFile assetsFile, string name, int index, bool multiSampled, int dimension):
+			this(assetsFile, name, index, dimension)
+		{
+			MultiSampled = multiSampled;
+		}
+
 		public void Read(EndianStream stream)
 		{
 			NameIndex = stream.ReadInt32();
@@ -28,6 +48,7 @@ namespace UnityRipper.Classes.Shaders
 			stream.AlignStream(AlignType.Align4);
 		}
 
+		public string Name { get; private set; }
 		public int NameIndex { get; private set; }
 		public int Index { get; private set; }
 		public int SamplerIndex { get; private set; }

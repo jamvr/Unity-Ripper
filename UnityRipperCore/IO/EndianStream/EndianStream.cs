@@ -358,7 +358,7 @@ namespace UnityRipper
 
 		public void Read(short[] buffer, int index, int count)
 		{
-			for (int i = 0, j = index; i < count; i++, index++)
+			for (int i = 0, j = index; i < count; i++, j++)
 			{
 				buffer[j] = ReadInt16();
 			}
@@ -366,7 +366,7 @@ namespace UnityRipper
 
 		public void Read(ushort[] buffer, int index, int count)
 		{
-			for (int i = 0, j = index; i < count; i++, index++)
+			for (int i = 0, j = index; i < count; i++, j++)
 			{
 				buffer[j] = ReadUInt16();
 			}
@@ -374,7 +374,7 @@ namespace UnityRipper
 
 		public void Read(int[] buffer, int index, int count)
 		{
-			for (int i = 0, j = index; i < count; i++, index++)
+			for (int i = 0, j = index; i < count; i++, j++)
 			{
 				buffer[j] = ReadInt32();
 			}
@@ -382,7 +382,7 @@ namespace UnityRipper
 
 		public void Read(uint[] buffer, int index, int count)
 		{
-			for (int i = 0, j = index; i < count; i++, index++)
+			for (int i = 0, j = index; i < count; i++, j++)
 			{
 				buffer[j] = ReadUInt32();
 			}
@@ -390,7 +390,7 @@ namespace UnityRipper
 
 		public void Read(long[] buffer, int index, int count)
 		{
-			for (int i = 0, j = index; i < count; i++, index++)
+			for (int i = 0, j = index; i < count; i++, j++)
 			{
 				buffer[j] = ReadInt64();
 			}
@@ -398,7 +398,7 @@ namespace UnityRipper
 
 		public void Read(ulong[] buffer, int index, int count)
 		{
-			for (int i = 0, j = index; i < count; i++, index++)
+			for (int i = 0, j = index; i < count; i++, j++)
 			{
 				buffer[j] = ReadUInt64();
 			}
@@ -406,7 +406,7 @@ namespace UnityRipper
 
 		public void Read(float[] buffer, int index, int count)
 		{
-			for(int i = 0, j = index; i < count; i++, index++)
+			for(int i = 0, j = index; i < count; i++, j++)
 			{
 				buffer[j] = ReadSingle();
 			}

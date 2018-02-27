@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using UnityRipper.AssetsFiles;
 
 namespace UnityRipper.Classes.Shaders
@@ -26,7 +28,7 @@ namespace UnityRipper.Classes.Shaders
 			}
 
 			ShaderHardwareTier = stream.ReadByte();
-			GpuProgramType = stream.ReadByte();
+			GpuProgramType = (ShaderGpuProgramType)stream.ReadByte();
 			stream.AlignStream(AlignType.Align4);
 
 			m_vectorParams = stream.ReadArray<VectorParameter>();
@@ -47,11 +49,29 @@ namespace UnityRipper.Classes.Shaders
 			}
 		}
 
+		public StringBuilder ToString(StringBuilder sb, ShaderSubProgramBlob blob, bool isTier)
+		{
+			sb.AppendIntent(4).Append("SubProgram").Append(' ');
+			sb.Append('"').Append(GpuProgramType.ToGPUPlatform()).Append(' ');
+			if(isTier)
+			{
+				sb.Append("hw_tier").Append(ShaderHardwareTier.ToString("00")).Append(' ');
+			}
+			sb.Append('"').Append(' ').Append('{').Append('\n');
+			sb.AppendIntent(5);
+			
+			blob.SubPrograms[(int)BlobIndex].ToString(sb);
+
+			sb.Append('\n');
+			sb.AppendIntent(4).Append('}').Append('\n');
+			return sb;
+		}
+
 		public uint BlobIndex { get; private set; }
 		public ParserBindChannels Channels { get; } = new ParserBindChannels();
 		public IReadOnlyList<ushort> KeywordIndices => m_keywordIndices;
 		public byte ShaderHardwareTier { get; private set; }
-		public byte GpuProgramType { get; private set; }
+		public ShaderGpuProgramType GpuProgramType { get; private set; }
 		public IReadOnlyList<VectorParameter> VectorParams => m_vectorParams;
 		public IReadOnlyList<MatrixParameter> MatrixParams => m_matrixParams;
 		public IReadOnlyList<TextureParameter> TextureParams => m_textureParams;
