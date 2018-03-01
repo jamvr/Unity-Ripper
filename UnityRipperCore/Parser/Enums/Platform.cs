@@ -41,6 +41,9 @@
 		Android					= 13,
 		WinGLESEmu				= 14,
 		WinGLES20Emu			= 15,
+		/// <summary>
+		/// Google Native Client
+		/// </summary>
 		GoogleNaCl				= 16,
 		/// <summary>
 		/// Build a Linux standalone

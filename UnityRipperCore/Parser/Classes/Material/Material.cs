@@ -180,7 +180,11 @@ namespace UnityRipper.Classes
 		public IReadOnlyList<string> DisabledShaderPasses => m_disabledShaderPasses;
 		public Dictionary<string, string> StringTagMap { get; }
 		public UnityPropertySheet SavedProperties { get; }
-		
+
+		/// <summary>
+		/// 5.5.0 and greater
+		/// </summary>
+		private bool IsSerialized => SShader.IsSerialized(Version);
 		/// <summary>
 		/// 4.1.0b and greater
 		/// </summary>
@@ -209,10 +213,6 @@ namespace UnityRipper.Classes
 		/// 5.6.0 and greater
 		/// </summary>
 		private bool IsReadDisabledShaderPasses => Version.IsGreaterEqual(5, 6);
-		/// <summary>
-		/// 5.5.0 and greater
-		/// </summary>
-		private bool IsSerialized => SShader.IsSerialized(Version);
 
 		private int SerializedVersion
 		{

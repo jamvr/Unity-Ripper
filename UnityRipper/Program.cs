@@ -21,7 +21,7 @@ namespace UnityRipper
 			Logger.Instance = ConsoleLogger.Instance;
 			Config.IsAdvancedLog = true;
 			Config.IsGenerateGUIDByContent = false;
-			Config.IsExportDependencies = true;
+			Config.IsExportDependencies = false;
 
 			if (args.Length == 0)
 			{

@@ -75,21 +75,23 @@ namespace UnityRipper.Classes.Shaders
 				case SerializedPropertyType._2D:
 				//case SerializedPropertyType._3D:
 				//case SerializedPropertyType.Cube:
-					if(DefTexture.TexDim == 2)
+					switch(DefTexture.TexDim)
 					{
-						sb.Append("2D");
-					}
-					else if (DefTexture.TexDim == 3)
-					{
-						sb.Append("3D");
-					}
-					else if (DefTexture.TexDim == 4)
-					{
-						sb.Append("Cube");
-					}
-					else
-					{
-						throw new NotSupportedException("Texture dimension isn't supported");
+						case 1:
+							sb.Append("any");
+							break;
+						case 2:
+							sb.Append("2D");
+							break;
+						case 3:
+							sb.Append("3D");
+							break;
+						case 4:
+							sb.Append("Cube");
+							break;
+						default:
+							throw new NotSupportedException("Texture dimension isn't supported");
+
 					}
 					break;
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityRipper.Classes;
 using UnityRipper.AssetExporters.Classes;
 
@@ -41,30 +42,38 @@ namespace UnityRipper.AssetExporters
 			}
 			m_exporters[classType] = exporter;
 		}
-				
+
 		public void Export(string path, Object @object)
 		{
 			Export(path, ToIEnumerable(@object));
 		}
-		
+
 		public void Export(string path, IEnumerable<Object> objects)
 		{
-			if(IsExporting)
+			if (IsExporting)
 			{
 				throw new InvalidOperationException("Unable to start a new export process until the old one is completed");
 			}
 
-			List<Object> deps = new List<Object>();
-			deps.AddRange(objects);
-			for (int i = 0; i < deps.Count; i++)
+			// speed up fetching a little bit
+			List<Object> depList = new List<Object>();
+			HashSet<Object> depSet = new HashSet<Object>();
+			HashSet<Object> queued = new HashSet<Object>();
+			depList.AddRange(objects);
+			depSet.UnionWith(depList);
+			for (int i = 0; i < depList.Count; i++)
 			{
-				Object current = deps[i];
-
-				if(!IsPresentInCollection(current))
+				Object current = depList[i];
+				if (!queued.Contains(current))
 				{
 					ClassIDType exportID = current.IsAsset ? current.ClassID : ClassIDType.Component;
 					IAssetExporter exporter = m_exporters[exportID];
 					IExportCollection collection = exporter.CreateCollection(current);
+
+					foreach (Object element in collection.Objects)
+					{
+						queued.Add(element);
+					}
 					m_collections.Add(collection);
 				}
 
@@ -73,19 +82,23 @@ namespace UnityRipper.AssetExporters
 				{
 					foreach (Object dep in current.FetchDependencies(true))
 					{
-						if (!deps.Contains(dep))
+						if (!depSet.Contains(dep))
 						{
-							deps.Add(dep);
+							depList.Add(dep);
+							depSet.Add(dep);
 						}
 					}
 				}
 			}
+			depList.Clear();
+			depSet.Clear();
+			queued.Clear();
 
-			foreach(IExportCollection collection in m_collections)
+			foreach (IExportCollection collection in m_collections)
 			{
 				m_currentCollection = collection;
 				bool isExported = collection.AssetExporter.Export(collection, path);
-				if(isExported)
+				if (isExported)
 				{
 					Logger.Log(LogType.Info, LogCategory.Export, $"'{collection.Name}' exported");
 				}
@@ -94,7 +107,7 @@ namespace UnityRipper.AssetExporters
 			m_currentCollection = null;
 			m_collections.Clear();
 		}
-		
+
 		public AssetType ToExportType(ClassIDType classID)
 		{
 			// abstract objects
@@ -110,7 +123,7 @@ namespace UnityRipper.AssetExporters
 					return AssetType.Serialized;
 			}
 
-			if(!m_exporters.ContainsKey(classID))
+			if (!m_exporters.ContainsKey(classID))
 			{
 				throw new NotImplementedException($"Export type for class {classID} is undefined");
 			}
@@ -136,7 +149,7 @@ namespace UnityRipper.AssetExporters
 				}
 			}
 
-			if(Config.IsExportDependencies)
+			if (Config.IsExportDependencies)
 			{
 				throw new InvalidOperationException($"Object {@object} wasn't found in any export collection");
 			}
@@ -148,16 +161,16 @@ namespace UnityRipper.AssetExporters
 
 		public ExportPointer CreateExportPointer(Object @object)
 		{
-			if(!IsExporting)
+			if (!IsExporting)
 			{
 				throw new InvalidOperationException("Export pointer could be used only during export process");
 			}
 
-			foreach(IExportCollection collection in m_collections)
+			foreach (IExportCollection collection in m_collections)
 			{
-				foreach(Object element in collection.Objects)
+				foreach (Object element in collection.Objects)
 				{
-					if(element == @object)
+					if (element == @object)
 					{
 						return collection.CreateExportPointer(element, collection == m_currentCollection);
 					}
@@ -178,21 +191,6 @@ namespace UnityRipper.AssetExporters
 		private IEnumerable<Object> ToIEnumerable(Object @object)
 		{
 			yield return @object;
-		}
-
-		private bool IsPresentInCollection(Object @object)
-		{
-			foreach(IExportCollection collection in m_collections)
-			{
-				foreach(Object element in collection.Objects)
-				{
-					if(element == @object)
-					{
-						return true;
-					}
-				}
-			}
-			return false;
 		}
 
 		private bool IsExporting => m_currentCollection != null;

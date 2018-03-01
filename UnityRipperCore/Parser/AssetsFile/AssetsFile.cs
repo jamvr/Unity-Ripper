@@ -22,7 +22,7 @@ namespace UnityRipper.AssetsFiles
 
 			m_collection = collection;
 			FilePath = filePath;
-			Name = fileName;
+			Name = fileName.ToLower();
 		}
 
 		public void Load(string assetPath)
@@ -59,7 +59,8 @@ namespace UnityRipper.AssetsFiles
 			Reset();
 			using (EndianStream stream = new EndianStream(baseStream, EndianType.BigEndian))
 			{
-				stream.StartPosition = baseStream.Position;
+				long startPosition = baseStream.Position;
+				stream.AlignPosition = startPosition;
 				int tableSize = stream.ReadInt32();
 				if (tableSize <= 0)
 				{
@@ -75,7 +76,7 @@ namespace UnityRipper.AssetsFiles
 				{
 					throw new Exception($"Unsuported file generation {Generation} for asset file '{Name}'");
 				}
-				long dataOffset = stream.StartPosition + stream.ReadUInt32();
+				long dataOffset = startPosition + stream.ReadUInt32();
 
 				//reference itself because sharedFileIDs start from 1
 				AssetsFilePtr dependency = new AssetsFilePtr(Name, string.Empty);

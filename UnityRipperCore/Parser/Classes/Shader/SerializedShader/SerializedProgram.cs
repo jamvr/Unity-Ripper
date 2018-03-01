@@ -31,7 +31,7 @@ namespace UnityRipper.Classes.Shaders
 				sb.Append(' ').Append('{').Append('\n');
 				foreach (SerializedSubProgram subProgram in SubPrograms)
 				{
-					GPUPlatform platform = subProgram.GpuProgramType.ToGPUPlatform();
+					GPUPlatform platform = subProgram.GpuProgramType.ToGPUPlatform(m_assetsFile.Platform);
 					int index = shader.Platforms.IndexOf(platform);
 					ShaderSubProgramBlob blob = shader.SubProgramBlobs[index];
 					int count = SubPrograms.Where(t => t.GpuProgramType == subProgram.GpuProgramType).Select(t => t.ShaderHardwareTier).Distinct().Count();

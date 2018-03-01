@@ -79,6 +79,7 @@ namespace UnityRipper.Classes
 			}
 
 			m_imageData = stream.ReadByteArray();
+			stream.AlignStream(AlignType.Align4);
 			if(IsReadStreamData)
 			{
 				StreamData.Read(stream);

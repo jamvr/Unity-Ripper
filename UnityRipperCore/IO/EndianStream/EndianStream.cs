@@ -420,10 +420,10 @@ namespace UnityRipper
 			}
 			long align = (long)alignType;
 			long cut = long.MaxValue - align;
-			long position = BaseStream.Position - StartPosition;
+			long position = BaseStream.Position - AlignPosition;
 
 			position = (position + align) & cut;
-			BaseStream.Position = StartPosition + position;
+			BaseStream.Position = AlignPosition + position;
 		}
 
 		private byte[] ReadStringBuffer(int length)
@@ -450,7 +450,7 @@ namespace UnityRipper
 		}
 
 		public EndianType EndianType { get; set; }
-		public long StartPosition { get; set; }
+		public long AlignPosition { get; set; }
 
 		private const int StringBufferSize = 8096;
 		

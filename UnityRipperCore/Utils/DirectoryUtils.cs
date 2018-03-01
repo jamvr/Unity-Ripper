@@ -19,7 +19,7 @@ namespace UnityRipper
 			int length = fileName.Length;
 			foreach (string existFile in files)
 			{
-				int dotIndex = existFile.IndexOf('.');
+				int dotIndex = existFile.IndexOf('.', length);
 				if (length == dotIndex)
 				{
 					fileName = fileName + 1.ToString();

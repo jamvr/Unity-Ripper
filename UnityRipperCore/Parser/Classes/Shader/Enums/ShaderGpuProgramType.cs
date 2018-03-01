@@ -91,9 +91,8 @@ namespace UnityRipper.Classes.Shaders
 			}
 		}
 
-		public static GPUPlatform ToGPUPlatform(this ShaderGpuProgramType _this)
+		public static GPUPlatform ToGPUPlatform(this ShaderGpuProgramType _this, Platform platform)
 		{
-#warning TODO: xbox, ps3, etc. support
 			switch(_this)
 			{
 				case ShaderGpuProgramType.GLES:
@@ -136,8 +135,41 @@ namespace UnityRipper.Classes.Shaders
 				case ShaderGpuProgramType.MetalFS:
 					return GPUPlatform.metal;
 
+				case ShaderGpuProgramType.Console:
+					switch(platform)
+					{
+						case Platform.PS3:
+							return GPUPlatform.ps3;
+						case Platform.PS4:
+							return GPUPlatform.ps4;
+						case Platform.PSM:
+							return GPUPlatform.psm;
+						case Platform.PSP2:
+							return GPUPlatform.psp2;
+
+						case Platform.XBox360:
+							return GPUPlatform.xbox360;
+						case Platform.XboxOne:
+							return GPUPlatform.xboxone;
+
+						case Platform.WiiU:
+							return GPUPlatform.wiiu;
+
+						case Platform.N3DS:
+							return GPUPlatform.n3ds;
+
+						case Platform.GoogleNaCl:
+							return GPUPlatform.glesdesktop;
+
+						case Platform.Flash:
+							return GPUPlatform.flash;
+
+						default:
+							throw new NotSupportedException($"Unsupported console platform {platform}");
+					}
+
 				default:
-					throw new Exception($"Unsupported gpu program type {_this}");
+					throw new NotSupportedException($"Unsupported gpu program type {_this}");
 			}
 		}
 	}

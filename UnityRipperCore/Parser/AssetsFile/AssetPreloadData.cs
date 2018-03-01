@@ -134,12 +134,12 @@ namespace UnityRipper.AssetsFiles
 			}
 			else
 			{
-				stream.StartPosition = m_offset;
+				stream.AlignPosition = m_offset;
 				Object.Read(stream);
 				long read = stream.BaseStream.Position - m_offset;
 				if (read != m_length)
 				{
-					throw new Exception($"Read {read} but expected {m_length}");
+					throw new Exception($"Read {read} but expected {m_length} for object {Object.GetType().Name}");
 				}
 			}
 		}

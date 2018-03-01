@@ -230,7 +230,7 @@ namespace UnityRipper.Classes.Shaders
 				sb.AppendIntent(5);
 			}
 
-#warning TODO: D3D listing
+#warning TODO: program listing
 			string programData = ProgramType.IsGL() || ProgramType.IsMetal() ?
 				Encoding.UTF8.GetString(m_programData) :
 				$"/*Can't export program data {ProgramType} as a text*/";

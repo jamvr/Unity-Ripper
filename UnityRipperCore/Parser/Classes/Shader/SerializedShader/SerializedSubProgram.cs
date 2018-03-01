@@ -52,7 +52,7 @@ namespace UnityRipper.Classes.Shaders
 		public StringBuilder ToString(StringBuilder sb, ShaderSubProgramBlob blob, bool isTier)
 		{
 			sb.AppendIntent(4).Append("SubProgram").Append(' ');
-			sb.Append('"').Append(GpuProgramType.ToGPUPlatform()).Append(' ');
+			sb.Append('"').Append(GpuProgramType.ToGPUPlatform(m_assetsFile.Platform)).Append(' ');
 			if(isTier)
 			{
 				sb.Append("hw_tier").Append(ShaderHardwareTier.ToString("00")).Append(' ');
