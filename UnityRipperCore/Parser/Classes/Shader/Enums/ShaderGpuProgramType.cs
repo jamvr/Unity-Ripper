@@ -93,6 +93,7 @@ namespace UnityRipper.Classes.Shaders
 
 		public static GPUPlatform ToGPUPlatform(this ShaderGpuProgramType _this)
 		{
+#warning TODO: xbox, ps3, etc. support
 			switch(_this)
 			{
 				case ShaderGpuProgramType.GLES:
@@ -111,8 +112,24 @@ namespace UnityRipper.Classes.Shaders
 				case ShaderGpuProgramType.GLLegacy:
 					return GPUPlatform.openGL;
 
+				case ShaderGpuProgramType.DX9VertexSM20:
+				case ShaderGpuProgramType.DX9VertexSM30:
+				case ShaderGpuProgramType.DX9PixelSM20:
+				case ShaderGpuProgramType.DX9PixelSM30:
+					return GPUPlatform.d3d9;
+
+				case ShaderGpuProgramType.DX10Level9Pixel:
+				case ShaderGpuProgramType.DX10Level9Vertex:
+					return GPUPlatform.d3d11_9x;
+
 				case ShaderGpuProgramType.DX11VertexSM40:
+				case ShaderGpuProgramType.DX11VertexSM50:
 				case ShaderGpuProgramType.DX11PixelSM40:
+				case ShaderGpuProgramType.DX11PixelSM50:
+				case ShaderGpuProgramType.DX11GeometrySM40:
+				case ShaderGpuProgramType.DX11GeometrySM50:
+				case ShaderGpuProgramType.DX11HullSM50:
+				case ShaderGpuProgramType.DX11DomainSM50:
 					return GPUPlatform.d3d11;
 
 				case ShaderGpuProgramType.MetalVS:
